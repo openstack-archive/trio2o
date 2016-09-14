@@ -1,0 +1,9 @@
+Code-Review+2: Chaoyi Huang <joehuang@huawei.com>
+Code-Review-1: Shinobu KINJO <shinobu@linux.com>
+Workflow+1: Shinobu KINJO <shinobu@linux.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 11 May 2016 03:30:51 +0000
+Reviewed-on: https://review.openstack.org/311069
+Project: openstack/trio2o
+Branch: refs/heads/master

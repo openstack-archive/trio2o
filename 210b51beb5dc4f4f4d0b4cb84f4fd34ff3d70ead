@@ -1,0 +1,8 @@
+Code-Review+2: Shinobu KINJO <shinobu@linux.com>
+Workflow+1: Shinobu KINJO <shinobu@linux.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Sat, 25 Jun 2016 10:24:49 +0000
+Reviewed-on: https://review.openstack.org/325209
+Project: openstack/trio2o
+Branch: refs/heads/master

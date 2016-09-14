@@ -1,0 +1,9 @@
+Code-Review+2: Zhiyuan Cai <luckyvega.g@gmail.com>
+Code-Review+2: Chaoyi Huang <joehuang@huawei.com>
+Workflow+1: Chaoyi Huang <joehuang@huawei.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 21 Jun 2016 05:09:08 +0000
+Reviewed-on: https://review.openstack.org/314994
+Project: openstack/trio2o
+Branch: refs/heads/master

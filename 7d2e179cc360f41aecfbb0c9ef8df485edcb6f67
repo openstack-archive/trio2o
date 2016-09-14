@@ -1,0 +1,8 @@
+Code-Review+2: Zhiyuan Cai <luckyvega.g@gmail.com>
+Workflow+1: Shinobu KINJO <shinobu@linux.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 20 Jul 2016 03:06:18 +0000
+Reviewed-on: https://review.openstack.org/344524
+Project: openstack/trio2o
+Branch: refs/heads/master
