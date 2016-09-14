@@ -1,0 +1,8 @@
+Code-Review+2: Zhiyuan Cai <luckyvega.g@gmail.com>
+Workflow+1: Zhiyuan Cai <luckyvega.g@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Mon, 28 Dec 2015 04:22:50 +0000
+Reviewed-on: https://review.openstack.org/261638
+Project: openstack/trio2o
+Branch: refs/heads/experiment

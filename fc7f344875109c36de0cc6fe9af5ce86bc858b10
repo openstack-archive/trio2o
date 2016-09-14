@@ -1,0 +1,8 @@
+Code-Review+2: Chaoyi Huang <joehuang@huawei.com>
+Workflow+1: Chaoyi Huang <joehuang@huawei.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Wed, 30 Dec 2015 00:03:20 +0000
+Reviewed-on: https://review.openstack.org/262197
+Project: openstack/trio2o
+Branch: refs/heads/experiment

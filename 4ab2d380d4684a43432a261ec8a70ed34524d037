@@ -1,0 +1,9 @@
+Code-Review+1: Zhipeng Huang <huangzhipeng@huawei.com>
+Code-Review+2: Zhiyuan Cai <luckyvega.g@gmail.com>
+Workflow+1: Zhiyuan Cai <luckyvega.g@gmail.com>
+Verified+2: Jenkins
+Submitted-by: Jenkins
+Submitted-at: Tue, 05 Jan 2016 07:15:43 +0000
+Reviewed-on: https://review.openstack.org/263168
+Project: openstack/trio2o
+Branch: refs/heads/experiment
