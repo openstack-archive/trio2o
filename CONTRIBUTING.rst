@@ -14,4 +14,4 @@ Any pull requests submitted through GitHub will be ignored.
 
 Any bug should be filed on Launchpad, not GitHub:
 
-   https://bugs.launchpad.net/tricircle
+   https://bugs.launchpad.net/trio2o

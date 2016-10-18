@@ -1,30 +1,30 @@
-# Devstack extras script to install Tricircle
+# Devstack extras script to install Trio2o
 
-# Test if any tricircle services are enabled
-# is_tricircle_enabled
-function is_tricircle_enabled {
+# Test if any trio2o services are enabled
+# is_trio2o_enabled
+function is_trio2o_enabled {
     [[ ,${ENABLED_SERVICES} =~ ,"t-api" ]] && return 0
     return 1
 }
 
-# create_tricircle_accounts() - Set up common required tricircle
+# create_trio2o_accounts() - Set up common required trio2o
 # service accounts in keystone
 # Project               User            Roles
 # -------------------------------------------------------------------------
-# $SERVICE_TENANT_NAME  tricircle       service
+# $SERVICE_TENANT_NAME  trio2o          service
 
-function create_tricircle_accounts {
+function create_trio2o_accounts {
     if [[ "$ENABLED_SERVICES" =~ "t-api" ]]; then
-        create_service_user "tricircle"
+        create_service_user "trio2o"
 
         if [[ "$KEYSTONE_CATALOG_BACKEND" = 'sql' ]]; then
-            local tricircle_api=$(get_or_create_service "tricircle" \
+            local trio2o_api=$(get_or_create_service "trio2o" \
                 "Cascading" "OpenStack Cascading Service")
-            get_or_create_endpoint $tricircle_api \
+            get_or_create_endpoint $trio2o_api \
                 "$REGION_NAME" \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_API_HOST:$TRICIRCLE_API_PORT/v1.0" \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_API_HOST:$TRICIRCLE_API_PORT/v1.0" \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_API_HOST:$TRICIRCLE_API_PORT/v1.0"
+                "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0" \
+                "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0" \
+                "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0"
         fi
     fi
 }
@@ -41,16 +41,16 @@ function create_nova_apigw_accounts {
         create_service_user "nova_apigw"
 
         if [[ "$KEYSTONE_CATALOG_BACKEND" = 'sql' ]]; then
-            local tricircle_nova_apigw=$(get_or_create_service "nova" \
+            local trio2o_nova_apigw=$(get_or_create_service "nova" \
                 "compute" "Nova Compute Service")
 
-            remove_old_endpoint_conf $tricircle_nova_apigw
+            remove_old_endpoint_conf $trio2o_nova_apigw
 
-            get_or_create_endpoint $tricircle_nova_apigw \
+            get_or_create_endpoint $trio2o_nova_apigw \
                 "$REGION_NAME" \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_NOVA_APIGW_HOST:$TRICIRCLE_NOVA_APIGW_PORT/v2.1/"'$(tenant_id)s' \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_NOVA_APIGW_HOST:$TRICIRCLE_NOVA_APIGW_PORT/v2.1/"'$(tenant_id)s' \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_NOVA_APIGW_HOST:$TRICIRCLE_NOVA_APIGW_PORT/v2.1/"'$(tenant_id)s'
+                "$SERVICE_PROTOCOL://$TRIO2O_NOVA_APIGW_HOST:$TRIO2O_NOVA_APIGW_PORT/v2.1/"'$(tenant_id)s' \
+                "$SERVICE_PROTOCOL://$TRIO2O_NOVA_APIGW_HOST:$TRIO2O_NOVA_APIGW_PORT/v2.1/"'$(tenant_id)s' \
+                "$SERVICE_PROTOCOL://$TRIO2O_NOVA_APIGW_HOST:$TRIO2O_NOVA_APIGW_PORT/v2.1/"'$(tenant_id)s'
         fi
     fi
 }
@@ -67,22 +67,22 @@ function create_cinder_apigw_accounts {
         create_service_user "cinder_apigw"
 
         if [[ "$KEYSTONE_CATALOG_BACKEND" = 'sql' ]]; then
-            local tricircle_cinder_apigw=$(get_or_create_service "cinder" \
+            local trio2o_cinder_apigw=$(get_or_create_service "cinder" \
                 "volumev2" "Cinder Volume Service")
 
-            remove_old_endpoint_conf $tricircle_cinder_apigw
+            remove_old_endpoint_conf $trio2o_cinder_apigw
 
-            get_or_create_endpoint $tricircle_cinder_apigw \
+            get_or_create_endpoint $trio2o_cinder_apigw \
                 "$REGION_NAME" \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_CINDER_APIGW_HOST:$TRICIRCLE_CINDER_APIGW_PORT/v2/"'$(tenant_id)s' \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_CINDER_APIGW_HOST:$TRICIRCLE_CINDER_APIGW_PORT/v2/"'$(tenant_id)s' \
-                "$SERVICE_PROTOCOL://$TRICIRCLE_CINDER_APIGW_HOST:$TRICIRCLE_CINDER_APIGW_PORT/v2/"'$(tenant_id)s'
+                "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v2/"'$(tenant_id)s' \
+                "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v2/"'$(tenant_id)s' \
+                "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v2/"'$(tenant_id)s'
         fi
     fi
 }
 
 
-# common config-file configuration for tricircle services
+# common config-file configuration for trio2o services
 function remove_old_endpoint_conf {
     local service=$1
 
@@ -102,24 +102,24 @@ function remove_old_endpoint_conf {
 }
 
 
-# create_tricircle_cache_dir() - Set up cache dir for tricircle
-function create_tricircle_cache_dir {
+# create_trio2o_cache_dir() - Set up cache dir for trio2o
+function create_trio2o_cache_dir {
 
     # Delete existing dir
-    sudo rm -rf $TRICIRCLE_AUTH_CACHE_DIR
-    sudo mkdir -p $TRICIRCLE_AUTH_CACHE_DIR
-    sudo chown `whoami` $TRICIRCLE_AUTH_CACHE_DIR
+    sudo rm -rf $TRIO2O_AUTH_CACHE_DIR
+    sudo mkdir -p $TRIO2O_AUTH_CACHE_DIR
+    sudo chown `whoami` $TRIO2O_AUTH_CACHE_DIR
 }
 
-# common config-file configuration for tricircle services
-function init_common_tricircle_conf {
+# common config-file configuration for trio2o services
+function init_common_trio2o_conf {
     local conf_file=$1
 
     touch $conf_file
     iniset $conf_file DEFAULT debug $ENABLE_DEBUG_LOG_LEVEL
     iniset $conf_file DEFAULT verbose True
     iniset $conf_file DEFAULT use_syslog $SYSLOG
-    iniset $conf_file DEFAULT tricircle_db_connection `database_connection_url tricircle`
+    iniset $conf_file DEFAULT trio2o_db_connection `database_connection_url trio2o`
 
     iniset $conf_file client admin_username admin
     iniset $conf_file client admin_password $ADMIN_PASSWORD
@@ -127,181 +127,154 @@ function init_common_tricircle_conf {
     iniset $conf_file client auto_refresh_endpoint True
     iniset $conf_file client top_pod_name $REGION_NAME
 
-    iniset $conf_file oslo_concurrency lock_path $TRICIRCLE_STATE_PATH/lock
+    iniset $conf_file oslo_concurrency lock_path $TRIO2O_STATE_PATH/lock
 }
 
-function configure_tricircle_api {
+function configure_trio2o_api {
 
     if is_service_enabled t-api ; then
-        echo "Configuring Tricircle API"
+        echo "Configuring Trio2o API"
 
-        init_common_tricircle_conf $TRICIRCLE_API_CONF
+        init_common_trio2o_conf $TRIO2O_API_CONF
 
-        setup_colorized_logging $TRICIRCLE_API_CONF DEFAULT tenant_name
+        setup_colorized_logging $TRIO2O_API_CONF DEFAULT tenant_name
 
         if is_service_enabled keystone; then
 
-            create_tricircle_cache_dir
+            create_trio2o_cache_dir
 
             # Configure auth token middleware
-            configure_auth_token_middleware $TRICIRCLE_API_CONF tricircle \
-                $TRICIRCLE_AUTH_CACHE_DIR
+            configure_auth_token_middleware $TRIO2O_API_CONF trio2o \
+                $TRIO2O_AUTH_CACHE_DIR
 
         else
-            iniset $TRICIRCLE_API_CONF DEFAULT auth_strategy noauth
+            iniset $TRIO2O_API_CONF DEFAULT auth_strategy noauth
         fi
 
     fi
 }
 
-function configure_tricircle_nova_apigw {
+function configure_trio2o_nova_apigw {
     if is_service_enabled t-ngw ; then
-        echo "Configuring Tricircle Nova APIGW"
+        echo "Configuring Trio2o Nova APIGW"
 
-        init_common_tricircle_conf $TRICIRCLE_NOVA_APIGW_CONF
+        init_common_trio2o_conf $TRIO2O_NOVA_APIGW_CONF
 
-        setup_colorized_logging $TRICIRCLE_NOVA_APIGW_CONF DEFAULT tenant_name
+        setup_colorized_logging $TRIO2O_NOVA_APIGW_CONF DEFAULT tenant_name
 
         if is_service_enabled keystone; then
 
-            create_tricircle_cache_dir
+            create_trio2o_cache_dir
 
             # Configure auth token middleware
-            configure_auth_token_middleware $TRICIRCLE_NOVA_APIGW_CONF tricircle \
-                $TRICIRCLE_AUTH_CACHE_DIR
+            configure_auth_token_middleware $TRIO2O_NOVA_APIGW_CONF trio2o \
+                $TRIO2O_AUTH_CACHE_DIR
 
         else
-            iniset $TRICIRCLE_NOVA_APIGW_CONF DEFAULT auth_strategy noauth
+            iniset $TRIO2O_NOVA_APIGW_CONF DEFAULT auth_strategy noauth
         fi
 
     fi
 }
 
-function configure_tricircle_cinder_apigw {
+function configure_trio2o_cinder_apigw {
     if is_service_enabled t-cgw ; then
-        echo "Configuring Tricircle Cinder APIGW"
+        echo "Configuring Trio2o Cinder APIGW"
 
-        init_common_tricircle_conf $TRICIRCLE_CINDER_APIGW_CONF
+        init_common_trio2o_conf $TRIO2O_CINDER_APIGW_CONF
 
-        setup_colorized_logging $TRICIRCLE_CINDER_APIGW_CONF DEFAULT tenant_name
+        setup_colorized_logging $TRIO2O_CINDER_APIGW_CONF DEFAULT tenant_name
 
         if is_service_enabled keystone; then
 
-            create_tricircle_cache_dir
+            create_trio2o_cache_dir
 
             # Configure auth token middleware
-            configure_auth_token_middleware $TRICIRCLE_CINDER_APIGW_CONF tricircle \
-                $TRICIRCLE_AUTH_CACHE_DIR
+            configure_auth_token_middleware $TRIO2O_CINDER_APIGW_CONF trio2o \
+                $TRIO2O_AUTH_CACHE_DIR
 
         else
-            iniset $TRICIRCLE_CINDER_APIGW_CONF DEFAULT auth_strategy noauth
+            iniset $TRIO2O_CINDER_APIGW_CONF DEFAULT auth_strategy noauth
         fi
 
     fi
 }
 
-function configure_tricircle_xjob {
+function configure_trio2o_xjob {
     if is_service_enabled t-job ; then
-        echo "Configuring Tricircle xjob"
+        echo "Configuring Trio2o xjob"
 
-        init_common_tricircle_conf $TRICIRCLE_XJOB_CONF
+        init_common_trio2o_conf $TRIO2O_XJOB_CONF
 
-        setup_colorized_logging $TRICIRCLE_XJOB_CONF DEFAULT
+        setup_colorized_logging $TRIO2O_XJOB_CONF DEFAULT
     fi
 }
 
-function start_new_neutron_server {
-    local server_index=$1
-    local region_name=$2
-    local q_port=$3
+function move_neutron_server {
+    local region_name=$1
+
+    remove_old_endpoint_conf "neutron"
 
     get_or_create_service "neutron" "network" "Neutron Service"
     get_or_create_endpoint "network" \
         "$region_name" \
-        "$Q_PROTOCOL://$SERVICE_HOST:$q_port/" \
-        "$Q_PROTOCOL://$SERVICE_HOST:$q_port/" \
-        "$Q_PROTOCOL://$SERVICE_HOST:$q_port/"
+        "$Q_PROTOCOL://$SERVICE_HOST:$Q_PORT/" \
+        "$Q_PROTOCOL://$SERVICE_HOST:$Q_PORT/" \
+        "$Q_PROTOCOL://$SERVICE_HOST:$Q_PORT/"
 
-    cp $NEUTRON_CONF $NEUTRON_CONF.$server_index
-    iniset $NEUTRON_CONF.$server_index database connection `database_connection_url $Q_DB_NAME$server_index`
-    iniset $NEUTRON_CONF.$server_index nova region_name $region_name
-    iniset $NEUTRON_CONF.$server_index DEFAULT bind_port $q_port
+    iniset $NEUTRON_CONF nova region_name $region_name
 
-    recreate_database $Q_DB_NAME$server_index
-    $NEUTRON_BIN_DIR/neutron-db-manage --config-file $NEUTRON_CONF.$server_index --config-file /$Q_PLUGIN_CONF_FILE upgrade head
-
-    run_process q-svc$server_index "$NEUTRON_BIN_DIR/neutron-server --config-file $NEUTRON_CONF.$server_index --config-file /$Q_PLUGIN_CONF_FILE"
+    stop_process q-svc
+    # remove previous failure flag file since we are going to restart service
+    rm -f "$SERVICE_DIR/$SCREEN_NAME"/q-svc.failure
+    sleep 20
+    run_process q-svc "$NEUTRON_BIN_DIR/neutron-server --config-file $NEUTRON_CONF --config-file /$Q_PLUGIN_CONF_FILE"
 }
 
-
-if [[ "$Q_ENABLE_TRICIRCLE" == "True" ]]; then
+if [[ "$Q_ENABLE_TRIO2O" == "True" ]]; then
     if [[ "$1" == "stack" && "$2" == "pre-install" ]]; then
-        echo summary "Tricircle pre-install"
+        echo summary "Trio2o pre-install"
     elif [[ "$1" == "stack" && "$2" == "install" ]]; then
-        echo_summary "Installing Tricircle"
+        echo_summary "Installing Trio2o"
     elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
-        echo_summary "Configuring Tricircle"
+        echo_summary "Configuring Trio2o"
 
-        sudo install -d -o $STACK_USER -m 755 $TRICIRCLE_CONF_DIR
+        sudo install -d -o $STACK_USER -m 755 $TRIO2O_CONF_DIR
 
-        configure_tricircle_api
-        configure_tricircle_nova_apigw
-        configure_tricircle_cinder_apigw
-        configure_tricircle_xjob
+        enable_service t-api t-job t-ngw t-cgw
 
-        echo export PYTHONPATH=\$PYTHONPATH:$TRICIRCLE_DIR >> $RC_DIR/.localrc.auto
+        configure_trio2o_api
+        configure_trio2o_nova_apigw
+        configure_trio2o_cinder_apigw
+        configure_trio2o_xjob
 
-        setup_package $TRICIRCLE_DIR -e
+        echo export PYTHONPATH=\$PYTHONPATH:$TRIO2O_DIR >> $RC_DIR/.localrc.auto
 
-        recreate_database tricircle
-        python "$TRICIRCLE_DIR/cmd/manage.py" "$TRICIRCLE_API_CONF"
+        setup_package $TRIO2O_DIR -e
 
-        if is_service_enabled q-svc ; then
-            start_new_neutron_server 1 $POD_REGION_NAME $TRICIRCLE_NEUTRON_PORT
-
-            # reconfigure neutron server to use our own plugin
-            echo "Configuring Neutron plugin for Tricircle"
-            Q_PLUGIN_CLASS="tricircle.network.plugin.TricirclePlugin"
-
-            iniset $NEUTRON_CONF DEFAULT core_plugin "$Q_PLUGIN_CLASS"
-            iniset $NEUTRON_CONF DEFAULT service_plugins ""
-            iniset $NEUTRON_CONF DEFAULT tricircle_db_connection `database_connection_url tricircle`
-            iniset $NEUTRON_CONF DEFAULT notify_nova_on_port_data_changes False
-            iniset $NEUTRON_CONF DEFAULT notify_nova_on_port_status_changes False
-            iniset $NEUTRON_CONF client admin_username admin
-            iniset $NEUTRON_CONF client admin_password $ADMIN_PASSWORD
-            iniset $NEUTRON_CONF client admin_tenant demo
-            iniset $NEUTRON_CONF client auto_refresh_endpoint True
-            iniset $NEUTRON_CONF client top_pod_name $REGION_NAME
-
-            if [ "$Q_ML2_PLUGIN_VLAN_TYPE_OPTIONS" != "" ]; then
-                iniset $NEUTRON_CONF tricircle type_drivers local,shared_vlan
-                iniset $NEUTRON_CONF tricircle tenant_network_types local,shared_vlan
-                iniset $NEUTRON_CONF tricircle network_vlan_ranges `echo $Q_ML2_PLUGIN_VLAN_TYPE_OPTIONS | awk -F= '{print $2}'`
-                iniset $NEUTRON_CONF tricircle bridge_network_type shared_vlan
-            fi
-        fi
+        recreate_database trio2o
+        python "$TRIO2O_DIR/cmd/manage.py" "$TRIO2O_API_CONF"
 
     elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
-        echo_summary "Initializing Tricircle Service"
+        echo_summary "Initializing Trio2o Service"
 
         if is_service_enabled t-api; then
 
-            create_tricircle_accounts
+            create_trio2o_accounts
 
-            run_process t-api "python $TRICIRCLE_API --config-file $TRICIRCLE_API_CONF"
+            run_process t-api "python $TRIO2O_API --config-file $TRIO2O_API_CONF"
         fi
 
         if is_service_enabled t-ngw; then
 
             create_nova_apigw_accounts
 
-            run_process t-ngw "python $TRICIRCLE_NOVA_APIGW --config-file $TRICIRCLE_NOVA_APIGW_CONF"
+            run_process t-ngw "python $TRIO2O_NOVA_APIGW --config-file $TRIO2O_NOVA_APIGW_CONF"
 
             # Nova services are running, but we need to re-configure them to
             # move them to bottom region
             iniset $NOVA_CONF neutron region_name $POD_REGION_NAME
-            iniset $NOVA_CONF neutron url "$Q_PROTOCOL://$SERVICE_HOST:$TRICIRCLE_NEUTRON_PORT"
+            iniset $NOVA_CONF neutron url "$Q_PROTOCOL://$SERVICE_HOST:$Q_PORT"
             iniset $NOVA_CONF cinder os_region_name $POD_REGION_NAME
 
             get_or_create_endpoint "compute" \
@@ -320,11 +293,15 @@ if [[ "$Q_ENABLE_TRICIRCLE" == "True" ]]; then
             run_process n-cpu "$NOVA_BIN_DIR/nova-compute --config-file $NOVA_CONF" $LIBVIRT_GROUP
         fi
 
+        if is_service_enabled q-svc; then
+            move_neutron_server $POD_REGION_NAME
+        fi
+
         if is_service_enabled t-cgw; then
 
             create_cinder_apigw_accounts
 
-            run_process t-cgw "python $TRICIRCLE_CINDER_APIGW --config-file $TRICIRCLE_CINDER_APIGW_CONF"
+            run_process t-cgw "python $TRIO2O_CINDER_APIGW --config-file $TRIO2O_CINDER_APIGW_CONF"
 
             get_or_create_endpoint "volumev2" \
                 "$POD_REGION_NAME" \
@@ -335,7 +312,7 @@ if [[ "$Q_ENABLE_TRICIRCLE" == "True" ]]; then
 
         if is_service_enabled t-job; then
 
-            run_process t-job "python $TRICIRCLE_XJOB --config-file $TRICIRCLE_XJOB_CONF"
+            run_process t-job "python $TRIO2O_XJOB --config-file $TRIO2O_XJOB_CONF"
         fi
     fi
 
@@ -355,10 +332,6 @@ if [[ "$Q_ENABLE_TRICIRCLE" == "True" ]]; then
 
         if is_service_enabled t-job; then
            stop_process t-job
-        fi
-
-        if is_service_enabled q-svc1; then
-           stop_process q-svc1
         fi
     fi
 fi
