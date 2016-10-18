@@ -23,12 +23,12 @@ from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_service import wsgi
 
-from tricircle.common import config
-from tricircle.common.i18n import _LI
-from tricircle.common.i18n import _LW
-from tricircle.common import restapp
+from trio2o.common import config
+from trio2o.common.i18n import _LI
+from trio2o.common.i18n import _LW
+from trio2o.common import restapp
 
-from tricircle.cinder_apigw import app
+from trio2o.cinder_apigw import app
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ def main():
     LOG.info(_LI("Cinder_APIGW on http://%(host)s:%(port)s with %(workers)s"),
              {'host': host, 'port': port, 'workers': workers})
 
-    service = wsgi.Server(CONF, 'Tricircle Cinder_APIGW',
+    service = wsgi.Server(CONF, 'Trio2o Cinder_APIGW',
                           application, host, port)
     restapp.serve(service, CONF, workers)
 

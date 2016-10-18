@@ -1,5 +1,5 @@
 ================================
-The Tricircle Style Commandments
+The Trio2o Style Commandments
 ================================
 
 Please read the OpenStack Style Commandments
