@@ -1,13 +1,13 @@
 =======================
-The Tricircle Admin API
+The Trio2o Admin API
 =======================
-This Admin API describes the ways of interacting with the Tricircle service
+This Admin API describes the ways of interacting with the Trio2o service
 via HTTP protocol using Representational State Transfer(ReST).
 
 API Versions
 ============
 In order to bring new features to users over time, versioning is supported
-by the Tricircle. The latest version of the Tricircle is v1.0.
+by the Trio2o. The latest version of the Trio2o is v1.0.
 
 The Version APIs work the same as other APIs as they still require
 authentication.
@@ -22,10 +22,10 @@ Service URLs
 ============
 All API calls through the rest of this document require authentication with
 the OpenStack Identity service. They also require a base service url that can
-be got from the OpenStack Tricircle endpoint. This will be the root url that
+be got from the OpenStack Trio2o endpoint. This will be the root url that
 every call below will be added to build a full path.
 
-For instance, if the Tricircle service url is http://127.0.0.1:19999/v1.0 then
+For instance, if the Trio2o service url is http://127.0.0.1:19999/v1.0 then
 the full API call for /pods is http://127.0.0.1:19999/v1.0/pods.
 
 As such, for the rest of this document we will leave out the root url where
@@ -33,9 +33,9 @@ GET /pods really means GET {tricircle_service_url}/pods.
 
 Pod
 ===
-A pod represents a region in Keystone. When operating a pod, the Tricircle
+A pod represents a region in Keystone. When operating a pod, the Trio2o
 decides the correct endpoints to send request based on the region of the pod.
-Considering the 2-layers architecture of the Tricircle, we also have two kinds
+Considering the 2-layers architecture of the Trio2o, we also have two kinds
 of pods: top pod and bottom pod.
 
 
@@ -59,7 +59,7 @@ following table.
 +-----------+-------+---------------+-----------------------------------------------------+
 |pod_name   |body   | string        |pod_name is specified by user but must match the     |
 |           |       |               |region name registered in Keystone. When creating a  |
-|           |       |               |bottom pod, the Tricircle automatically creates a    |
+|           |       |               |bottom pod, the Trio2o automatically creates a    |
 |           |       |               |host aggregation and assigns the new availability    |
 |           |       |               |zone id to it.                                       |
 +-----------+-------+---------------+-----------------------------------------------------+
@@ -142,7 +142,7 @@ means a bottom pod. All of its attributes are described in the following table.
 +-----------+-------+---------------+-----------------------------------------------------+
 |pod_name   |body   | string        |pod_name is specified by user but must match the     |
 |           |       |               |region name registered in Keystone. When creating a  |
-|           |       |               |bottom pod, the Tricircle automatically creates a    |
+|           |       |               |bottom pod, the Trio2o automatically creates a    |
 |           |       |               |host aggregation and assigns the new availability    |
 |           |       |               |zone id to it.                                       |
 +-----------+-------+---------------+-----------------------------------------------------+
@@ -198,7 +198,7 @@ in the following table.
 +===========+=======+===============+=====================================================+
 |pod_name   |body   | string        |pod_name is specified by user but must match the     |
 |           |       |               |region name registered in Keystone. When creating a  |
-|           |       |               |bottom pod, the Tricircle automatically creates a    |
+|           |       |               |bottom pod, the Trio2o automatically creates a    |
 |           |       |               |host aggregation and assigns the new availability    |
 |           |       |               |zone id to it.                                       |
 +-----------+-------+---------------+-----------------------------------------------------+
@@ -232,7 +232,7 @@ are listed below.
 +-----------+-------+---------------+-----------------------------------------------------+
 |pod_name   |body   | string        |pod_name is specified by user but must match the     |
 |           |       |               |region name registered in Keystone. When creating a  |
-|           |       |               |bottom pod, the Tricircle automatically creates a    |
+|           |       |               |bottom pod, the Trio2o automatically creates a    |
 |           |       |               |host aggregation and assigns the new availability    |
 |           |       |               |zone id to it.                                       |
 +-----------+-------+---------------+-----------------------------------------------------+

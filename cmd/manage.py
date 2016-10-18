@@ -18,14 +18,14 @@ import sys
 
 from oslo_config import cfg
 
-from tricircle.db import core
-from tricircle.db import migration_helpers
+from trio2o.db import core
+from trio2o.db import migration_helpers
 
 
 def main(argv=None, config_files=None):
     core.initialize()
     cfg.CONF(args=argv[2:],
-             project='tricircle',
+             project='trio2o',
              default_config_files=config_files)
     migration_helpers.find_migrate_repo()
     migration_helpers.sync_repo(2)

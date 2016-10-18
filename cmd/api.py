@@ -23,11 +23,11 @@ from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_service import wsgi
 
-from tricircle.api import app
-from tricircle.common import config
-from tricircle.common.i18n import _LI
-from tricircle.common.i18n import _LW
-from tricircle.common import restapp
+from trio2o.api import app
+from trio2o.common import config
+from trio2o.common.i18n import _LI
+from trio2o.common.i18n import _LW
+from trio2o.common import restapp
 
 
 CONF = cfg.CONF
@@ -49,7 +49,7 @@ def main():
     LOG.info(_LI("Admin API on http://%(host)s:%(port)s with %(workers)s"),
              {'host': host, 'port': port, 'workers': workers})
 
-    service = wsgi.Server(CONF, 'Tricircle Admin_API', application, host, port)
+    service = wsgi.Server(CONF, 'Trio2o Admin_API', application, host, port)
     restapp.serve(service, CONF, workers)
 
     LOG.info(_LI("Configuration:"))
