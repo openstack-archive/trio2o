@@ -2,6 +2,6 @@
 Usage
 ======
 
-To use tricircle in a project::
+To use trio2o in a project::
 
-    import tricircle
+    import trio2o
