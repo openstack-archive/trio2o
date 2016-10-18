@@ -27,11 +27,11 @@ import sys
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from tricircle.common import config
-from tricircle.common.i18n import _LI
-from tricircle.common.i18n import _LW
+from trio2o.common import config
+from trio2o.common.i18n import _LI
+from trio2o.common.i18n import _LW
 
-from tricircle.xjob import xservice
+from trio2o.xjob import xservice
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)

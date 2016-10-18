@@ -1,7 +1,7 @@
 [run]
 branch = True
-source = tricircle
-omit = tricircle/tests/*, tricircle/tempestplugin/*
+source = trio2o
+omit = trio2o/tests/*, trio2o/tempestplugin/*
 
 [report]
 ignore_errors = True
