@@ -37,7 +37,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'tricircle'
+project = u'trio2o'
 copyright = u'2015, OpenStack Foundation'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
