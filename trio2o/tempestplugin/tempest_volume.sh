@@ -29,6 +29,7 @@ TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_get"
 # add new test cases like following line for volume_type test
 # TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_type"
 TESTCASES="$TESTCASES)"
+TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test.test_volume_backup_create_get_detailed_list_restore_delete"
 
 ostestr --regex $TESTCASES
 
@@ -160,7 +161,7 @@ ostestr --regex $TESTCASES
 # tempest.api.volume.admin.test_volumes_actions.VolumesActionsV2Test.test_volume_reset_status[id-d063f96e-a2e0-4f34-8b8a-395c42de1845]
 # tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV1Test.test_volume_backup_create_get_detailed_list_restore_delete[id-a66eb488-8ee1-47d4-8e9f-575a095728c6]
 # tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV1Test.test_volume_backup_export_import[id-a99c54a1-dd80-4724-8a13-13bf58d4068d]
-# tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test.test_volume_backup_create_get_detailed_list_restore_delete[id-a66eb488-8ee1-47d4-8e9f-575a095728c6]
+# **DONE** tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test.test_volume_backup_create_get_detailed_list_restore_delete[id-a66eb488-8ee1-47d4-8e9f-575a095728c6]
 # tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test.test_volume_backup_export_import[id-a99c54a1-dd80-4724-8a13-13bf58d4068d]
 # tempest.api.volume.test_availability_zone.AvailabilityZoneV1TestJSON.test_get_availability_zone_list[id-01f1ae88-eba9-4c6b-a011-6f7ace06b725]
 # tempest.api.volume.test_availability_zone.AvailabilityZoneV2TestJSON.test_get_availability_zone_list[id-01f1ae88-eba9-4c6b-a011-6f7ace06b725]
