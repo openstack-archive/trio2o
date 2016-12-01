@@ -201,7 +201,7 @@ class ServerController(rest.RestController):
         pecan.response.status = 204
         return pecan.response
 
-    def _get_or_create_route(self, context, pod, _id, _type):
+    def _get_or_create_route(self, context, pod_name, _id, _type):
         def list_resources(t_ctx, q_ctx, pod_, ele, _type_):
             client = self._get_client(pod_['pod_name'])
             return client.list_resources(_type_, t_ctx, [{'key': 'name',
@@ -209,7 +209,7 @@ class ServerController(rest.RestController):
                                                           'value': ele['id']}])
 
         return t_lock.get_or_create_route(context, None,
-                                          self.project_id, pod, {'id': _id},
+                                          self.project_id, pod_name, {'id': _id},
                                           _type, list_resources)
 
     @staticmethod
