@@ -15,8 +15,6 @@
 
 from pecan import expose
 from pecan import rest
-import re
-import urlparse
 
 import trio2o.common.client as t_client
 from trio2o.common import constants
@@ -24,45 +22,6 @@ import trio2o.common.context as t_context
 from trio2o.common.i18n import _
 from trio2o.common import utils
 import trio2o.db.api as db_api
-
-
-def url_join(*parts):
-    """Convenience method for joining parts of a URL
-
-    Any leading and trailing '/' characters are removed, and the parts joined
-    together with '/' as a separator. If last element of 'parts' is an empty
-    string, the returned URL will have a trailing slash.
-    """
-    parts = parts or ['']
-    clean_parts = [part.strip('/') for part in parts if part]
-    if not parts[-1]:
-        # Empty last element should add a trailing slash
-        clean_parts.append('')
-    return '/'.join(clean_parts)
-
-
-def remove_trailing_version_from_href(href):
-    """Removes the api version from the href.
-
-    Given: 'http://www.nova.com/compute/v1.1'
-    Returns: 'http://www.nova.com/compute'
-
-    Given: 'http://www.nova.com/v1.1'
-    Returns: 'http://www.nova.com'
-
-    """
-    parsed_url = urlparse.urlsplit(href)
-    url_parts = parsed_url.path.rsplit('/', 1)
-
-    # NOTE: this should match vX.X or vX
-    expression = re.compile(r'^v([0-9]+|[0-9]+\.[0-9]+)(/.*|$)')
-    if not expression.match(url_parts.pop()):
-        raise ValueError('URL %s does not contain version' % href)
-
-    new_path = url_join(*url_parts)
-    parsed_url = list(parsed_url)
-    parsed_url[2] = new_path
-    return urlparse.urlunsplit(parsed_url)
 
 
 class ImageController(rest.RestController):
@@ -76,9 +35,10 @@ class ImageController(rest.RestController):
             context, db_api.get_top_pod(context)['pod_id'],
             constants.ST_NOVA)
         nova_url = nova_url.replace('/$(tenant_id)s', '')
-        self_link = url_join(nova_url, self.project_id, 'images', image['id'])
-        bookmark_link = url_join(
-            remove_trailing_version_from_href(nova_url),
+        self_link = utils.url_join(nova_url, self.project_id,
+                                   'images', image['id'])
+        bookmark_link = utils.url_join(
+            utils.remove_trailing_version_from_href(nova_url),
             self.project_id, 'images', image['id'])
         glance_url = self.client.get_endpoint(
             context, db_api.get_top_pod(context)['pod_id'],
