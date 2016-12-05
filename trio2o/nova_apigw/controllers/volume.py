@@ -35,9 +35,9 @@ class VolumeController(rest.RestController):
     def __init__(self, project_id, server_id):
         self.project_id = project_id
         self.server_id = server_id
-        self.clients = {'top': t_client.Client()}
+        self.clients = {constants.TOP: t_client.Client()}
 
-    def _get_client(self, pod_name='top'):
+    def _get_client(self, pod_name=constants.TOP):
         if pod_name not in self.clients:
             self.clients[pod_name] = t_client.Client(pod_name)
         return self.clients[pod_name]
