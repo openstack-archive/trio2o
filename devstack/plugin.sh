@@ -238,7 +238,7 @@ if [[ "$Q_ENABLE_TRIO2O" == "True" ]]; then
         echo_summary "Installing Trio2o"
     elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
         echo_summary "Configuring Trio2o"
-
+        export NEUTRON_CREATE_INITIAL_NETWORKS=False
         sudo install -d -o $STACK_USER -m 755 $TRIO2O_CONF_DIR
 
         enable_service t-api t-job t-ngw t-cgw
