@@ -231,107 +231,105 @@ function move_neutron_server {
     run_process q-svc "$NEUTRON_BIN_DIR/neutron-server --config-file $NEUTRON_CONF --config-file /$Q_PLUGIN_CONF_FILE"
 }
 
-if [[ "$Q_ENABLE_TRIO2O" == "True" ]]; then
-    if [[ "$1" == "stack" && "$2" == "pre-install" ]]; then
+   if [[ "$1" == "stack" && "$2" == "pre-install" ]]; then
         echo summary "Trio2o pre-install"
-    elif [[ "$1" == "stack" && "$2" == "install" ]]; then
+   elif [[ "$1" == "stack" && "$2" == "install" ]]; then
         echo_summary "Installing Trio2o"
-    elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
-        echo_summary "Configuring Trio2o"
-        export NEUTRON_CREATE_INITIAL_NETWORKS=False
-        sudo install -d -o $STACK_USER -m 755 $TRIO2O_CONF_DIR
+   elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
+       echo_summary "Configuring Trio2o"
 
-        enable_service t-api t-job t-ngw t-cgw
+       sudo install -d -o $STACK_USER -m 755 $TRIO2O_CONF_DIR
 
-        configure_trio2o_api
-        configure_trio2o_nova_apigw
-        configure_trio2o_cinder_apigw
-        configure_trio2o_xjob
+       enable_service t-api t-job t-ngw t-cgw
 
-        echo export PYTHONPATH=\$PYTHONPATH:$TRIO2O_DIR >> $RC_DIR/.localrc.auto
+       configure_trio2o_api
+       configure_trio2o_nova_apigw
+       configure_trio2o_cinder_apigw
+       configure_trio2o_xjob
 
-        setup_package $TRIO2O_DIR -e
+       echo export PYTHONPATH=\$PYTHONPATH:$TRIO2O_DIR >> $RC_DIR/.localrc.auto
 
-        recreate_database trio2o
-        python "$TRIO2O_DIR/cmd/manage.py" "$TRIO2O_API_CONF"
+       setup_package $TRIO2O_DIR -e
 
-    elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
-        echo_summary "Initializing Trio2o Service"
+       recreate_database trio2o
+       python "$TRIO2O_DIR/cmd/manage.py" "$TRIO2O_API_CONF"
 
-        if is_service_enabled t-api; then
+   elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
+       echo_summary "Initializing Trio2o Service"
 
-            create_trio2o_accounts
+       if is_service_enabled t-api; then
 
-            run_process t-api "python $TRIO2O_API --config-file $TRIO2O_API_CONF"
-        fi
+           create_trio2o_accounts
 
-        if is_service_enabled t-ngw; then
+           run_process t-api "python $TRIO2O_API --config-file $TRIO2O_API_CONF"
+       fi
 
-            create_nova_apigw_accounts
+       if is_service_enabled t-ngw; then
 
-            run_process t-ngw "python $TRIO2O_NOVA_APIGW --config-file $TRIO2O_NOVA_APIGW_CONF"
+           create_nova_apigw_accounts
 
-            # Nova services are running, but we need to re-configure them to
-            # move them to bottom region
-            iniset $NOVA_CONF neutron region_name $POD_REGION_NAME
-            iniset $NOVA_CONF neutron url "$Q_PROTOCOL://$SERVICE_HOST:$Q_PORT"
-            iniset $NOVA_CONF cinder os_region_name $POD_REGION_NAME
+           run_process t-ngw "python $TRIO2O_NOVA_APIGW --config-file $TRIO2O_NOVA_APIGW_CONF"
 
-            get_or_create_endpoint "compute" \
-                "$POD_REGION_NAME" \
-                "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
-                "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
-                "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s'
+           # Nova services are running, but we need to re-configure them to
+           # move them to bottom region
+           iniset $NOVA_CONF neutron region_name $POD_REGION_NAME
+           iniset $NOVA_CONF neutron url "$Q_PROTOCOL://$SERVICE_HOST:$Q_PORT"
+           iniset $NOVA_CONF cinder os_region_name $POD_REGION_NAME
 
-            stop_process n-api
-            stop_process n-cpu
-            # remove previous failure flag file since we are going to restart service
-            rm -f "$SERVICE_DIR/$SCREEN_NAME"/n-api.failure
-            rm -f "$SERVICE_DIR/$SCREEN_NAME"/n-cpu.failure
-            sleep 20
-            run_process n-api "$NOVA_BIN_DIR/nova-api"
-            run_process n-cpu "$NOVA_BIN_DIR/nova-compute --config-file $NOVA_CONF" $LIBVIRT_GROUP
-        fi
+           get_or_create_endpoint "compute" \
+               "$POD_REGION_NAME" \
+               "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
+               "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
+               "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s'
 
-        if is_service_enabled q-svc; then
+           stop_process n-api
+           stop_process n-cpu
+           # remove previous failure flag file since we are going to restart service
+           rm -f "$SERVICE_DIR/$SCREEN_NAME"/n-api.failure
+           rm -f "$SERVICE_DIR/$SCREEN_NAME"/n-cpu.failure
+           sleep 20
+           run_process n-api "$NOVA_BIN_DIR/nova-api"
+           run_process n-cpu "$NOVA_BIN_DIR/nova-compute --config-file $NOVA_CONF" $LIBVIRT_GROUP
+       fi
+
+       if is_service_enabled q-svc; then
             move_neutron_server $POD_REGION_NAME
-        fi
+       fi
 
-        if is_service_enabled t-cgw; then
+       if is_service_enabled t-cgw; then
 
-            create_cinder_apigw_accounts
+           create_cinder_apigw_accounts
 
-            run_process t-cgw "python $TRIO2O_CINDER_APIGW --config-file $TRIO2O_CINDER_APIGW_CONF"
+           run_process t-cgw "python $TRIO2O_CINDER_APIGW --config-file $TRIO2O_CINDER_APIGW_CONF"
 
-            get_or_create_endpoint "volumev2" \
-                "$POD_REGION_NAME" \
-                "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s' \
-                "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s' \
-                "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s'
-        fi
+           get_or_create_endpoint "volumev2" \
+               "$POD_REGION_NAME" \
+               "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s' \
+               "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s' \
+               "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s'
+       fi
 
-        if is_service_enabled t-job; then
+       if is_service_enabled t-job; then
 
-            run_process t-job "python $TRIO2O_XJOB --config-file $TRIO2O_XJOB_CONF"
-        fi
-    fi
+           run_process t-job "python $TRIO2O_XJOB --config-file $TRIO2O_XJOB_CONF"
+       fi
+   fi
 
-    if [[ "$1" == "unstack" ]]; then
+   if [[ "$1" == "unstack" ]]; then
 
-        if is_service_enabled t-api; then
-           stop_process t-api
-        fi
+       if is_service_enabled t-api; then
+          stop_process t-api
+       fi
 
-        if is_service_enabled t-ngw; then
-           stop_process t-ngw
-        fi
+       if is_service_enabled t-ngw; then
+          stop_process t-ngw
+       fi
 
-        if is_service_enabled t-cgw; then
-           stop_process t-cgw
-        fi
+       if is_service_enabled t-cgw; then
+          stop_process t-cgw
+       fi
 
-        if is_service_enabled t-job; then
-           stop_process t-job
-        fi
-    fi
-fi
+       if is_service_enabled t-job; then
+          stop_process t-job
+       fi
+   fi
