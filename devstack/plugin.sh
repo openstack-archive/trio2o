@@ -231,6 +231,10 @@ function move_neutron_server {
     run_process q-svc "$NEUTRON_BIN_DIR/neutron-server --config-file $NEUTRON_CONF --config-file /$Q_PLUGIN_CONF_FILE"
 }
 
+# if the plugin is enabled to run, that means the TRIO2O is
+# enabled by default
+export Q_ENABLE_TRIO2O=True
+
 if [[ "$Q_ENABLE_TRIO2O" == "True" ]]; then
     if [[ "$1" == "stack" && "$2" == "pre-install" ]]; then
         echo summary "Trio2o pre-install"
