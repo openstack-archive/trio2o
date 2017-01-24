@@ -42,81 +42,92 @@ installing DevStack in virtual machine.
 
   you should get output looks like as following::
 
-        +----------------------------------+-----------+--------------+----------------+
-        | ID                               | Region    | Service Name | Service Type   |
-        +----------------------------------+-----------+--------------+----------------+
-        | e8a1f1a333334106909e05037db3fbf6 | Pod1      | neutron      | network        |
-        | 72c02a11856a4814a84b60ff72e0028d | Pod1      | cinderv2     | volumev2       |
-        | a26cff63563a480eaba334185a7f2cec | Pod1      | nova         | compute        |
-        | f90d97f8959948088ab58bc143ecb011 | RegionOne | cinderv3     | volumev3       |
-        | ed1af45af0d8459ea409e5c0dd0aadba | RegionOne | cinder       | volume         |
-        | ae6024a582534c21aee0c6d7fa5b90fb | RegionOne | nova         | compute        |
-        | c75ab09edc874bb781b0d376cec74623 | RegionOne | cinderv2     | volumev2       |
-        | 80ce6a2d12aa43fab693f4e619670d97 | RegionOne | trio2o       | Cascading      |
-        | 11a4b451da1a4db6ae14b0aa282f9ba6 | RegionOne | nova_legacy  | compute_legacy |
-        | 546a8abf29244223bc9d5dd4960553a7 | RegionOne | glance       | image          |
-        | 0e9c9343b50e4b7080b25f4e297f79d3 | RegionOne | keystone     | identity       |
-        +----------------------------------+-----------+--------------+----------------+
+        +----------------------------------+---------------+--------------+----------------+
+        | ID                               | Region        | Service Name | Service Type   |
+        +----------------------------------+---------------+--------------+----------------+
+        | e344aa909c824e97a00297b1a982df55 | RegionOne     | cinder       | volume         |
+        | b5a8d095775a4d0bbee6bd65f0ad4d51 | RegionOne     | keystone     | identity       |
+        | 1199242d8ca84d60a0f9cc0a4bdeb3f1 | CentralRegion | nova         | compute        |
+        | a8dbec8f3acb42ceae3a2a2c5d8a8a6e | CentralRegion | trio2o       | Cascading      |
+        | eecf80a4087a44fcaa0832ce9dcd572c | CentralRegion | tricircle    | tricircle      |
+        | d3a47aedfd2d478dae9fd5fc24f30948 | CentralRegion | neutron      | network        |
+        | 85a9a5505d9a4e7cbdc5cebbfd020b70 | RegionOne     | cinderv3     | volumev3       |
+        | e275f633d2b44823a3aa044413390d11 | CentralRegion | cinderv2     | volumev2       |
+        | f1348aac746145538af83cbab43dca62 | RegionOne     | cinderv2     | volumev2       |
+        | 735b1186e568458f96f24755f336ed92 | RegionOne     | nova_legacy  | compute_legacy |
+        | 64da2be08f5f4f688136d7aa1213d555 | CentralRegion | glance       | image          |
+        | 1a38116e228e4f8388d24a6a53ac8c24 | RegionOne     | nova         | compute        |
+        | 17596269d3844883b13d93dca437db0a | RegionOne     | neutron      | network        |
+        +----------------------------------+---------------+--------------+----------------+
 
-  "RegionOne" is the region where the Trio2o Admin API(ID is
-  80ce6a2d12aa43fab693f4e619670d97 in the above list), Nova API gateway(
-  ID is ae6024a582534c21aee0c6d7fa5b90fb) and Cinder API gateway( ID is
-  c75ab09edc874bb781b0d376cec74623) are running in. "Pod1" is the normal
+  "CentralRegion" is the region where the Trio2o Admin API(ID is
+  a8dbec8f3acb42ceae3a2a2c5d8a8a6e in the above list), Nova API gateway(
+  ID is 1199242d8ca84d60a0f9cc0a4bdeb3f1) and Cinder API gateway( ID is
+  e275f633d2b44823a3aa044413390d11) are running in. "RegionOne" is the normal
   bottom OpenStack region which includes Nova, Cinder, Neutron.
 
 - 8 Get token for the later commands. Run::
 
-      openstack --os-region-name=RegionOne token issue
+      export mytoken=$(openstack --os-region-name=RegionOne token issue -f value -c id)
 
 - 9 Create pod instances for the Trio2o to manage the mapping between
   availability zone and OpenStack instances, the "$token" is obtained in the
   step 7::
 
-      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
-          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "RegionOne"}}'
+      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
+          -H "X-Auth-Token: $mytoken" -d '{"pod": {"pod_name":  "CentralRegion"}}'
 
-      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
-          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "Pod1", "az_name": "az1"}}'
+      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
+          -H "X-Auth-Token: $mytoken" -d '{"pod": {"pod_name":  "RegionOne", "az_name": "az1"}}'
 
   Pay attention to "pod_name" parameter we specify when creating pod. Pod name
   should exactly match the region name registered in Keystone. In the above
   commands, we create pods named "RegionOne" and "Pod1".
 
+  Add pod instances for the Tricircle::
+
+      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
+          -H "X-Auth-Token: $mytoken" -d '{"pod": {"region_name":  "CentralRegion"}}'
+
+      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
+          -H "X-Auth-Token: $mytoken" -d '{"pod": {"region_name":  "RegionOne", "az_name": "az1"}}'
+
 - 10 Create necessary resources in local Neutron server::
 
-     neutron --os-region-name=Pod1 net-create net1
-     neutron --os-region-name=Pod1 subnet-create net1 10.0.0.0/24
+     neutron --os-region-name=CentralRegion net-create net1
+     neutron --os-region-name=CentralRegion subnet-create net1 10.0.0.0/24
 
   Please note that the net1 ID will be used in later step to boot VM.
 
-- 11 Get image ID and flavor ID which will be used in VM booting::
+- 11 Get image ID and flavor ID which will be used in VM booting in next step::
 
-     glance --os-region-name=RegionOne image-list
-     nova --os-region-name=RegionOne flavor-create test 1 1024 10 1
-     nova --os-region-name=RegionOne flavor-list
+     glance --os-region-name=CentralRegion image-list
+     nova --os-region-name=CentralRegion flavor-create test 1 1024 10 1
+     nova --os-region-name=CentralRegion flavor-list
 
-- 12 Boot a virtual machine::
+- 12 Boot a virtual machine, replace image_id, net_id to the value you get
+  at previous steps::
 
-     nova --os-region-name=RegionOne boot --flavor 1 --image $image_id --nic net-id=$net_id vm1
+     nova --os-region-name=CentralRegion boot --flavor 1 --image $image_id --nic net-id=$net_id vm1
 
 - 13 Verify the VM is connected to the net1::
 
-     neutron --os-region-name=Pod1 port-list
-     nova --os-region-name=RegionOne list
+     neutron --os-region-name=CentralRegion port-list
+     nova --os-region-name=CentralRegion list
 
 - 14 Create, list, show and delete volume::
 
-     cinder --os-region-name=RegionOne create --availability-zone=az1 1
-     cinder --os-region-name=RegionOne list
-     cinder --os-region-name=RegionOne show $volume_id
-     cinder --os-region-name=RegionOne delete $volume_id
-     cinder --os-region-name=RegionOne list
+     cinder --os-region-name=CentralRegion create --availability-zone=az1 1
+     cinder --os-region-name=CentralRegion list
+     cinder --os-region-name=CentralRegion show $volume_id
+     cinder --os-region-name=CentralRegion delete $volume_id
+     cinder --os-region-name=CentralRegion list
 
 - 15 Using --debug to make sure the commands are issued to Nova API gateway
   or Cinder API gateway::
 
-     nova --debug --os-region-name=RegionOne list
-     cinder --debug --os-region-name=RegionOne list
+     nova --debug --os-region-name=CentralRegion list
+     cinder --debug --os-region-name=CentralRegion list
 
   The nova command should be sent to http://162.3.124.203:19998/ and cinder
   command to http://162.3.124.203:19997/
@@ -143,7 +154,7 @@ Add another pod to Trio2o with DevStack
 - 4 In node-2 local.conf, change the REGION_NAME for the REGION_NAME is
   used as the region name if needed::
 
-    REGION_NAME=Pod2
+    REGION_NAME=RegionTwo
 
 - 5 In node-2 local.conf, change following IP to the host's IP address of node-2,
   for example, if node-2's management interface IP address is 162.3.124.204::
@@ -155,33 +166,27 @@ Add another pod to Trio2o with DevStack
   node-1, so change the KEYSTONE_REGION_NAME and KEYSTONE host IP address
   to node-1 IP address accordingly::
 
-    KEYSTONE_REGION_NAME=RegionOne
+    KEYSTONE_REGION_NAME=RegionTwo
     KEYSTONE_SERVICE_HOST=162.3.124.203
-    KEYSTONE_AUTH_HOST=162.3.124.203
 
-- 7 In node-2, the OpenStack will use the Glance which is running in
-  node-1, so change the GLANCE_SERVICE_HOST IP address to node-1 IP
-  address accordingly::
-    GLANCE_SERVICE_HOST=162.3.124.203
-
-- 8 Run DevStack. In DevStack folder, run::
+- 7 Run DevStack. In DevStack folder, run::
 
     ./stack.sh
 
-- 9 After node-2 DevStack successfully starts, return to the noed-1. In
+- 8 After node-2 DevStack successfully starts, return to the noed-1. In
   node-1 DevStack folder::
 
       source openrc admin admin
 
-- 10 Unset the region name environment variable in node-1, so that the command
+- 9 Unset the region name environment variable in node-1, so that the command
   can be issued to specified region in following commands as needed::
 
       unset OS_REGION_NAME
 
-- 11 Check if services in node-1 and node-2 have been correctly registered.
+- 10 Check if services in node-1 and node-2 have been correctly registered.
   Run::
 
-      openstack --os-region-name=RegionOne endpoint list
+      openstack --os-region-name=CentralRegion endpoint list
 
   you should get output looks like as following::
 
@@ -223,7 +228,7 @@ Add another pod to Trio2o with DevStack
   availability zone and OpenStack instances, the "$token" is obtained in the
   step 11::
 
-      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
+      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
           -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "Pod2", "az_name": "az2"}}'
 
   Pay attention to "pod_name" parameter we specify when creating pod. Pod name

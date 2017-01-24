@@ -22,20 +22,32 @@ export TRIO2O_TEMPEST_PLUGIN_DIR=$TRIO2O_DIR/trio2o/tempestplugin
 export TEMPEST_DIR=$DEST/tempest
 export TEMPEST_CONF=$TEMPEST_DIR/etc/tempest.conf
 
-# use admin role to create Trio2o top Pod and Pod1
+# use admin role to create Trio2o CentralRegion and RegionOne
 source $DEVSTACK_DIR/openrc admin admin
+unset OS_REGION_NAME
 
-token=$(openstack token issue | awk 'NR==5 {print $4}')
-echo $token
+mytoken=$(openstack --os-region-name=RegionOne token issue -f value -c id)
+echo $mytoken
+
+#Trio2o pod management
+curl -X POST http://127.0.0.1:19996/v1.0/pods \
+    -H "Content-Type: application/json" \
+    -H "X-Auth-Token: $mytoken" -d '{"pod": {"pod_name":  "CentralRegion"}}'
+
+curl -X POST http://127.0.0.1:19996/v1.0/pods \
+    -H "Content-Type: application/json" \
+    -H "X-Auth-Token: $mytoken" \
+    -d '{"pod": {"pod_name":  "RegionOne", "az_name": "az1"}}'
+
+# Tricircle pod management
+curl -X POST http://127.0.0.1:19999/v1.0/pods \
+    -H "Content-Type: application/json" \
+    -H "X-Auth-Token: $mytoken" -d '{"pod": {"region_name":  "CentralRegion"}}'
 
 curl -X POST http://127.0.0.1:19999/v1.0/pods \
     -H "Content-Type: application/json" \
-    -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "RegionOne"}}'
-
-curl -X POST http://127.0.0.1:19999/v1.0/pods \
-    -H "Content-Type: application/json" \
-    -H "X-Auth-Token: $token" \
-    -d '{"pod": {"pod_name":  "Pod1", "az_name": "az1"}}'
+    -H "X-Auth-Token: $mytoken" \
+    -d '{"pod": {"region_name":  "RegionOne", "az_name": "az1"}}'
 
 # the usage of "nova flavor-create":
 # nova flavor-create [--ephemeral <ephemeral>] [--swap <swap>]
@@ -43,8 +55,8 @@ curl -X POST http://127.0.0.1:19999/v1.0/pods \
 #                    <name> <id> <ram> <disk> <vcpus>
 # the following command is to create a flavor wih name='test',
 # id=1, ram=1024MB, disk=10GB, vcpu=1
-nova flavor-create test 1 1024 10 1
-image_id=$(openstack image list | awk 'NR==4 {print $2}')
+nova --os-region-name=CentralRegion flavor-create test 1 1024 10 1
+image_id=$(glance --os-region-name=CentralRegion image-list | awk 'NR==4 {print $2}')
 
 # preparation for the tests
 cd $TEMPEST_DIR
@@ -68,11 +80,11 @@ iniset $TEMPEST_CONF auth admin_password $OS_PASSWORD
 iniset $TEMPEST_CONF identity uri $OS_AUTH_URL
 iniset $TEMPEST_CONF identity-feature-enabled api_v3 false
 
-iniset $TEMPEST_CONF compute region RegionOne
+iniset $TEMPEST_CONF compute region CentralRegion
 iniset $TEMPEST_CONF compute image_ref $image_id
 iniset $TEMPEST_CONF compute image_ref_alt $image_id
 
-iniset $TEMPEST_CONF volume region RegionOne
+iniset $TEMPEST_CONF volume region CentralRegion
 iniset $TEMPEST_CONF volume catalog_type volumev2
 iniset $TEMPEST_CONF volume endpoint_type publicURL
 iniset $TEMPEST_CONF volume-feature-enabled api_v1 false

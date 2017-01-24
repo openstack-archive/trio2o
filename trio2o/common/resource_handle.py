@@ -218,9 +218,11 @@ class NovaResourceHandle(ResourceHandle):
         cli = n_client.Client(api_versions.APIVersion(cxt.nova_micro_version),
                               auth_token=cxt.auth_token,
                               auth_url=self.auth_url,
+                              project_id=cxt.tenant,
                               timeout=cfg.CONF.client.nova_timeout)
-        cli.set_management_url(
-            self.endpoint_url.replace('$(tenant_id)s', cxt.tenant))
+        print "clillllllllllent"
+        print cli
+
         return cli
 
     def _adapt_resource(self, resource):
