@@ -24,7 +24,7 @@ from trio2o.common import restapp
 common_opts = [
     cfg.IPOpt('bind_host', default='0.0.0.0',
               help=_("The host IP to bind to")),
-    cfg.PortOpt('bind_port', default=19999,
+    cfg.PortOpt('bind_port', default=19996,
                 help=_("The port to bind to")),
     cfg.IntOpt('api_workers', default=1,
                help=_("number of api workers")),
