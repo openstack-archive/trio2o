@@ -20,6 +20,11 @@ export TEMPEST_CONF=$TEMPEST_DIR/etc/tempest.conf
 # preparation for the tests
 cd $TEMPEST_DIR
 
+iniset $TEMPEST_CONF identity auth_version v2
+iniset $TEMPEST_CONF identity uri_v3 http://$SERVICE_HOST/identity/v3
+iniset $TEMPEST_CONF identity uri http://$SERVICE_HOST:5000/v2.0/
+iniset $TEMPEST_CONF identity-feature-enabled api_v2 True
+
 # Run functional test
 echo "Running Trio2o functional test suite..."
 
