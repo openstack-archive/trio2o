@@ -15,41 +15,13 @@ RABBIT_PASSWORD=password
 SERVICE_PASSWORD=password
 SERVICE_TOKEN=password
 ADMIN_PASSWORD=password
-LOGFILE=/opt/stack/logs/stack.sh.log
-VERBOSE=True
-LOG_COLOR=True
-SCREEN_LOGDIR=/opt/stack/logs
-FIXED_RANGE=10.0.0.0/24
-NETWORK_GATEWAY=10.0.0.1
-FIXED_NETWORK_SIZE=256
-FLOATING_RANGE=10.100.100.160/24
-Q_FLOATING_ALLOCATION_POOL=start=10.100.100.160,end=10.100.100.192
-NEUTRON_CREATE_INITIAL_NETWORKS=False
-PUBLIC_NETWORK_GATEWAY=10.100.100.3
-Q_USE_SECGROUP=False
-LIBVIRT_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 
 # Enable Trio2o
-Q_ENABLE_TRIO2O=True
+TRIO2O_START_SERVICES=True
 enable_plugin trio2o https://github.com/openstack/trio2o/
 
 # Change the HOST_IP address to the host's IP address where
 # the Trio2o is running
 HOST_IP=162.3.124.203
 
-# Use Neutron instead of nova-network
-disable_service n-net
-enable_service q-svc
-enable_service q-dhcp
-enable_service q-agt
-
-disable_service n-obj
-disable_service n-cauth
-disable_service n-novnc
-disable_service q-l3
-enable_service c-api
-enable_service c-vol
-enable_service c-sch
-disable_service c-bak
-disable_service tempest
 disable_service horizon
