@@ -227,8 +227,9 @@ class MicroversionsTest(MicroVersionFunctionTest):
             api_version=api_versions.APIVersion(
                 constants.NOVA_APIGW_MIN_VERSION),
             auth_token=None, auth_url='auth_url',
-            direct_use=False, project_id=None,
-            timeout=60, username=None, api_key=None)
+            direct_use=False, project_id=None, project_name=None,
+            endpoint_override='endpoint_url', project_domain_name=None,
+            timeout=60, username=None)
 
     @mock.patch.object(server.ServerController, '_get_client',
                        new=get_trio2o_client)
@@ -241,8 +242,9 @@ class MicroversionsTest(MicroVersionFunctionTest):
         mock_client.assert_called_with(
             api_version=api_versions.APIVersion(self.vaild_version.split()[1]),
             auth_token=None, auth_url='auth_url',
-            direct_use=False, project_id=None,
-            timeout=60, username=None, api_key=None)
+            direct_use=False, project_id=None, project_name=None,
+            endpoint_override='endpoint_url', project_domain_name=None,
+            timeout=60, username=None)
 
     @mock.patch.object(server.ServerController, '_get_client',
                        new=get_trio2o_client)
@@ -255,8 +257,9 @@ class MicroversionsTest(MicroVersionFunctionTest):
         mock_client.assert_called_with(
             api_version=api_versions.APIVersion(self.vaild_leagcy_version),
             auth_token=None, auth_url='auth_url',
-            direct_use=False, project_id=None,
-            timeout=60, username=None, api_key=None)
+            direct_use=False, project_id=None, project_name=None,
+            endpoint_override='endpoint_url', project_domain_name=None,
+            timeout=60, username=None)
 
     @mock.patch.object(server.ServerController, '_get_client',
                        new=get_trio2o_client)
@@ -270,8 +273,9 @@ class MicroversionsTest(MicroVersionFunctionTest):
             api_version=api_versions.APIVersion(
                 constants.NOVA_APIGW_MAX_VERSION),
             auth_token=None, auth_url='auth_url',
-            direct_use=False, project_id=None,
-            timeout=60, username=None, api_key=None)
+            direct_use=False, project_id=None, project_name=None,
+            endpoint_override='endpoint_url', project_domain_name=None,
+            timeout=60, username=None)
 
     @mock.patch.object(server.ServerController, '_get_client',
                        new=get_trio2o_client)
@@ -284,8 +288,9 @@ class MicroversionsTest(MicroVersionFunctionTest):
         mock_client.assert_called_with(
             api_version=api_versions.APIVersion(self.min_version),
             auth_token=None, auth_url='auth_url',
-            direct_use=False, project_id=None,
-            timeout=60, username=None, api_key=None)
+            direct_use=False, project_id=None,project_name=None,
+            endpoint_override='endpoint_url', project_domain_name=None, 
+            timeout=60, username=None)
 
     @mock.patch.object(server.ServerController, '_get_client',
                        new=get_trio2o_client)
@@ -298,8 +303,9 @@ class MicroversionsTest(MicroVersionFunctionTest):
         mock_client.assert_called_with(
             api_version=api_versions.APIVersion(self.max_version.split()[1]),
             auth_token=None, auth_url='auth_url',
-            direct_use=False, project_id=None,
-            timeout=60, username=None, api_key=None)
+            direct_use=False, project_id=None, project_name=None,
+            endpoint_override='endpoint_url', project_domain_name=None,
+            timeout=60, username=None, )
 
     @mock.patch.object(server.ServerController, '_get_client',
                        new=get_trio2o_client)
@@ -413,8 +419,9 @@ class MicroversionsTest(MicroVersionFunctionTest):
         mock_client.assert_called_with(
             api_version=api_versions.APIVersion(self.vaild_version.split()[1]),
             auth_token=None, auth_url='auth_url',
-            direct_use=False, project_id=None,
-            timeout=60, username=None, api_key=None)
+            direct_use=False, project_id=None, project_name=None,
+            endpoint_override='endpoint_url', project_domain_name=None,
+            timeout=60, username=None)
 
     @mock.patch.object(server.ServerController, '_get_client',
                        new=get_trio2o_client)
