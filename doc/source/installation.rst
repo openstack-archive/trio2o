@@ -72,20 +72,20 @@ installing DevStack in virtual machine.
   availability zone and OpenStack instances, the "$token" is obtained in the
   step 7::
 
-      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
+      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
           -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "RegionOne"}}'
 
-      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
+      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
           -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "Pod1", "az_name": "az1"}}'
 
   Pay attention to "pod_name" parameter we specify when creating pod. Pod name
   should exactly match the region name registered in Keystone. In the above
   commands, we create pods named "RegionOne" and "Pod1".
 
-- 10 Create necessary resources in local Neutron server::
+- 10 Create necessary resources in Neutron server::
 
-     neutron --os-region-name=Pod1 net-create net1
-     neutron --os-region-name=Pod1 subnet-create net1 10.0.0.0/24
+     neutron --os-region-name=RegionOne net-create net1
+     neutron --os-region-name=RegionOne subnet-create net1 10.0.0.0/24
 
   Please note that the net1 ID will be used in later step to boot VM.
 
@@ -101,8 +101,9 @@ installing DevStack in virtual machine.
 
 - 13 Verify the VM is connected to the net1::
 
-     neutron --os-region-name=Pod1 port-list
      nova --os-region-name=RegionOne list
+     nova --os-region-name=Pod1 list
+     neutron --os-region-name=RegionOne port-list
 
 - 14 Create, list, show and delete volume::
 
@@ -223,7 +224,7 @@ Add another pod to Trio2o with DevStack
   availability zone and OpenStack instances, the "$token" is obtained in the
   step 11::
 
-      curl -X POST http://127.0.0.1:19999/v1.0/pods -H "Content-Type: application/json" \
+      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
           -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "Pod2", "az_name": "az2"}}'
 
   Pay attention to "pod_name" parameter we specify when creating pod. Pod name
