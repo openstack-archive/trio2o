@@ -215,12 +215,14 @@ class NovaResourceHandle(ResourceHandle):
                         'server_volume': ACTION}
 
     def _get_client(self, cxt):
+        url = self.endpoint_url.replace('$(tenant_id)s', cxt.tenant)
         cli = n_client.Client(api_versions.APIVersion(cxt.nova_micro_version),
                               auth_token=cxt.auth_token,
                               auth_url=self.auth_url,
+                              project_name=cxt.tenant_name,
+                              project_domain_name=cxt.project_domain,
+                              endpoint_override=url,
                               timeout=cfg.CONF.client.nova_timeout)
-        cli.set_management_url(
-            self.endpoint_url.replace('$(tenant_id)s', cxt.tenant))
         return cli
 
     def _adapt_resource(self, resource):
