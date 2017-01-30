@@ -25,8 +25,8 @@ the OpenStack Identity service. They also require a base service url that can
 be got from the OpenStack Trio2o endpoint. This will be the root url that
 every call below will be added to build a full path.
 
-For instance, if the Trio2o service url is http://127.0.0.1:19999/v1.0 then
-the full API call for /pods is http://127.0.0.1:19999/v1.0/pods.
+For instance, if the Trio2o service url is http://127.0.0.1:19996/v1.0 then
+the full API call for /pods is http://127.0.0.1:19996/v1.0/pods.
 
 As such, for the rest of this document we will leave out the root url where
 GET /pods really means GET {trio2o_service_url}/pods.

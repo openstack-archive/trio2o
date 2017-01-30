@@ -25,16 +25,18 @@ export TEMPEST_CONF=$TEMPEST_DIR/etc/tempest.conf
 # use admin role to create Trio2o top Pod and Pod1
 source $DEVSTACK_DIR/openrc admin admin
 
-token=$(openstack token issue | awk 'NR==5 {print $4}')
-echo $token
+unset OS_REGION_NAME
 
-curl -X POST http://127.0.0.1:19999/v1.0/pods \
-    -H "Content-Type: application/json" \
-    -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "RegionOne"}}'
+mytoken=$(openstack --os-region-name=RegionOne token issue -f value -c id)
+echo $mytoken
 
-curl -X POST http://127.0.0.1:19999/v1.0/pods \
+curl -X POST http://127.0.0.1:19996/v1.0/pods \
     -H "Content-Type: application/json" \
-    -H "X-Auth-Token: $token" \
+    -H "X-Auth-Token: $mytoken" -d '{"pod": {"pod_name":  "RegionOne"}}'
+
+curl -X POST http://127.0.0.1:19996/v1.0/pods \
+    -H "Content-Type: application/json" \
+    -H "X-Auth-Token: $mytoken" \
     -d '{"pod": {"pod_name":  "Pod1", "az_name": "az1"}}'
 
 # the usage of "nova flavor-create":
@@ -43,8 +45,8 @@ curl -X POST http://127.0.0.1:19999/v1.0/pods \
 #                    <name> <id> <ram> <disk> <vcpus>
 # the following command is to create a flavor wih name='test',
 # id=1, ram=1024MB, disk=10GB, vcpu=1
-nova flavor-create test 1 1024 10 1
-image_id=$(openstack image list | awk 'NR==4 {print $2}')
+nova --os-region-name=RegionOne flavor-create test 1 1024 10 1
+image_id=$(glance --os-region-name=RegionOne image-list | awk 'NR==4 {print $2}')
 
 # preparation for the tests
 cd $TEMPEST_DIR
