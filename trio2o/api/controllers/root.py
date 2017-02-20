@@ -14,15 +14,11 @@
 #    under the License.
 
 
-import oslo_log.log as logging
 import pecan
 from pecan import request
 
 from trio2o.api.controllers import pod
 import trio2o.common.context as t_context
-
-
-LOG = logging.getLogger(__name__)
 
 
 def expose(*args, **kwargs):

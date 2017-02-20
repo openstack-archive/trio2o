@@ -19,8 +19,6 @@ from pecan import expose
 from pecan import hooks
 from pecan import rest
 
-import oslo_log.log as logging
-
 import webob.exc as web_exc
 
 from trio2o.common import constants
@@ -34,9 +32,6 @@ from trio2o.nova_apigw.controllers import network
 from trio2o.nova_apigw.controllers import quota_sets
 from trio2o.nova_apigw.controllers import server
 from trio2o.nova_apigw.controllers import volume
-
-
-LOG = logging.getLogger(__name__)
 
 
 class ErrorHook(hooks.PecanHook):

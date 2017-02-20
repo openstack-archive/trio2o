@@ -19,14 +19,10 @@ import pecan
 import re
 import urlparse
 
-from oslo_log import log as logging
-
 from trio2o.common import constants as cons
 import trio2o.common.exceptions as t_exceptions
 from trio2o.common.i18n import _
 import trio2o.db.api as db_api
-
-LOG = logging.getLogger(__name__)
 
 
 def get_import_path(cls):
