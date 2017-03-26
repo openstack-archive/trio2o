@@ -295,7 +295,7 @@ class Client(object):
                     cxt, config_filters)
 
                 if len(config_list) > 1:
-                    raise exceptions.EndpointNotUnique(pod_id, service)
+                    continue
                 if len(config_list) == 1:
                     config_id = config_list[0]['service_id']
                     update_dict = {
