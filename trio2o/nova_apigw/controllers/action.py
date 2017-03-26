@@ -37,7 +37,16 @@ class ActionController(rest.RestController):
         self.clients = {constants.TOP: t_client.Client()}
         self.handle_map = {
             'os-start': self._handle_start,
-            'os-stop': self._handle_stop
+            'os-stop': self._handle_stop,
+            'forceDelete': self._handle_force_delete,
+            'lock': self._handle_lock,
+            'unlock': self._handle_unlock,
+            'pause': self._handle_pause,
+            'unpause': self._handle_unpause,
+            'resume': self._handle_resume,
+            'suspend': self._handle_suspend,
+            'migrate': self._handle_migrate,
+            'trigger_crash_dump': self._handle_trigger_crash_dump
         }
 
     def _get_client(self, pod_name=constants.TOP):
@@ -52,6 +61,43 @@ class ActionController(rest.RestController):
     def _handle_stop(self, context, pod_name, body):
         client = self._get_client(pod_name)
         return client.action_servers(context, 'stop', self.server_id)
+
+    def _handle_force_delete(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'force_delete', self.server_id)
+
+    def _handle_pause(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'pause', self.server_id)
+
+    def _handle_unpause(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'unpause', self.server_id)
+
+    def _handle_lock(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'lock', self.server_id)
+
+    def _handle_unlock(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'unlock', self.server_id)
+
+    def _handle_suspend(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'suspend', self.server_id)
+
+    def _handle_resume(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'resume', self.server_id)
+
+    def _handle_trigger_crash_dump(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'trigger_crash_dump',
+                                     self.server_id)
+
+    def _handle_migrate(self, context, pod_name, body):
+        client = self._get_client(pod_name)
+        return client.action_servers(context, 'migrate', self.server_id)
 
     @expose(generic=True, template='json')
     def post(self, **kw):
