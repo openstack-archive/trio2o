@@ -252,6 +252,7 @@ function move_neutron_server {
     # remove previous failure flag file since we are going to restart service
     rm -f "$SERVICE_DIR/$SCREEN_NAME"/q-svc.failure
     sleep 20
+    enable_service q-svc
     run_process q-svc "$NEUTRON_BIN_DIR/neutron-server --config-file $NEUTRON_CONF --config-file /$Q_PLUGIN_CONF_FILE"
 }
 
