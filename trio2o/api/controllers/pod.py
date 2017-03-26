@@ -27,6 +27,7 @@ import trio2o.common.context as t_context
 import trio2o.common.exceptions as t_exc
 from trio2o.common.i18n import _
 from trio2o.common.i18n import _LE
+from trio2o.common import policy
 from trio2o.common import utils
 
 from trio2o.db import api as db_api
@@ -45,8 +46,8 @@ class PodsController(rest.RestController):
     def post(self, **kw):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to create pods'))
+        if not policy.enforce(context, policy.ADMIN_API_PODS_CREATE):
+            pecan.abort(401, _('Unauthorized to create pods'))
             return
 
         if 'pod' not in kw:
@@ -129,8 +130,8 @@ class PodsController(rest.RestController):
     def get_one(self, _id):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to show pods'))
+        if not policy.enforce(context, policy.ADMIN_API_PODS_SHOW):
+            pecan.abort(401, _('Unauthorized to show pods'))
             return
 
         try:
@@ -143,8 +144,8 @@ class PodsController(rest.RestController):
     def get_all(self):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to list pods'))
+        if not policy.enforce(context, policy.ADMIN_API_PODS_LIST):
+            pecan.abort(401, _('Unauthorized to list pods'))
             return
 
         try:
@@ -160,8 +161,8 @@ class PodsController(rest.RestController):
     def delete(self, _id):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to delete pods'))
+        if not policy.enforce(context, policy.ADMIN_API_PODS_DELETE):
+            pecan.abort(401, _('Unauthorized to delete pods'))
             return
 
         try:
@@ -174,7 +175,6 @@ class PodsController(rest.RestController):
                         az_ag.delete_ag(context, ag['id'])
                 core.delete_resource(context, models.Pod, _id)
                 pecan.response.status = 200
-                return {}
         except t_exc.ResourceNotFound:
             return Response(_('Pod not found'), 404)
         except Exception as e:
@@ -212,8 +212,8 @@ class BindingsController(rest.RestController):
     def post(self, **kw):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to create bindings'))
+        if not policy.enforce(context, policy.ADMIN_API_BINDINGS_CREATE):
+            pecan.abort(401, _('Unauthorized to create bindings'))
             return
 
         if 'pod_binding' not in kw:
@@ -272,8 +272,8 @@ class BindingsController(rest.RestController):
     def get_one(self, _id):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to show bindings'))
+        if not policy.enforce(context, policy.ADMIN_API_BINDINGS_SHOW):
+            pecan.abort(401, _('Unauthorized to show bindings'))
             return
 
         try:
@@ -290,8 +290,8 @@ class BindingsController(rest.RestController):
     def get_all(self):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to list bindings'))
+        if not policy.enforce(context, policy.ADMIN_API_BINDINGS_LIST):
+            pecan.abort(401, _('Unauthorized to list bindings'))
             return
 
         try:
@@ -309,15 +309,14 @@ class BindingsController(rest.RestController):
     def delete(self, _id):
         context = t_context.extract_context_from_environ()
 
-        if not t_context.is_admin_context(context):
-            pecan.abort(400, _('Admin role required to delete bindings'))
+        if not policy.enforce(context, policy.ADMIN_API_BINDINGS_DELETE):
+            pecan.abort(401, _('Unauthorized to delete bindings'))
             return
 
         try:
             with context.session.begin():
                 core.delete_resource(context, models.PodBinding, _id)
                 pecan.response.status = 200
-                return {}
         except t_exc.ResourceNotFound:
             pecan.abort(404, _('Pod binding not found'))
             return
