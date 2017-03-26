@@ -21,15 +21,18 @@ import sys
 
 from oslo_config import cfg
 import oslo_log.log as logging
+from oslo_policy import opts as policy_opts
 
 from trio2o.common.i18n import _LI
 
-# from trio2o import policy
+from trio2o.common import policy
 from trio2o.common import rpc
 from trio2o.common import version
 
-
+logging.register_options(cfg.CONF)
 LOG = logging.getLogger(__name__)
+
+policy_opts.set_defaults(cfg.CONF, 'policy.json')
 
 
 def init(opts, args, **kwargs):
@@ -45,6 +48,7 @@ def init(opts, args, **kwargs):
              **kwargs)
 
     _setup_logging()
+    _setup_policy()
 
     rpc.init(cfg.CONF)
 
@@ -60,11 +64,23 @@ def _setup_logging():
     LOG.debug("command line: %s", " ".join(sys.argv))
 
 
+def _setup_policy():
+
+    # if there is valid policy file, use policy file by oslo_policy
+    # otherwise, use the default policy value in policy.py
+    policy_file = cfg.CONF.oslo_policy.policy_file
+    if policy_file and cfg.CONF.find_file(policy_file):
+        # just return here, oslo_policy lib will use policy file by itself
+        return
+
+    policy.populate_default_rules()
+
+
 def reset_service():
     # Reset worker in case SIGHUP is called.
     # Note that this is called only in case a service is running in
     # daemon mode.
     _setup_logging()
 
-    # TODO(zhiyuan) enforce policy later
-    # policy.refresh()
+    policy.reset()
+    _setup_policy()

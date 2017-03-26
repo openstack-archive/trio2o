@@ -21,6 +21,7 @@ import pecan
 
 from trio2o.api.controllers import pod
 from trio2o.common import context
+from trio2o.common import policy
 from trio2o.common import utils
 from trio2o.db import core
 from trio2o.db import models
@@ -32,6 +33,7 @@ class PodsControllerTest(unittest.TestCase):
         core.ModelBase.metadata.create_all(core.get_engine())
         self.controller = pod.PodsController()
         self.context = context.get_admin_context()
+        policy.populate_default_rules()
 
     @patch.object(context, 'extract_context_from_environ')
     def test_post_top_pod(self, mock_context):
@@ -133,3 +135,4 @@ class PodsControllerTest(unittest.TestCase):
 
     def tearDown(self):
         core.ModelBase.metadata.drop_all(core.get_engine())
+        policy.reset()
