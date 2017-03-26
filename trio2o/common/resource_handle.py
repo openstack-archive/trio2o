@@ -94,7 +94,7 @@ class GlanceResourceHandle(ResourceHandle):
         try:
             client = self._get_client(cxt)
             collection = '%ss' % resource
-            return [res.to_dict() for res in getattr(
+            return [res for res in getattr(
                 client, collection).list(filters=_transform_filters(filters))]
         except g_exceptions.InvalidEndpoint:
             self.endpoint_url = None
