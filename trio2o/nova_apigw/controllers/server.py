@@ -16,7 +16,6 @@
 import pecan
 from pecan import expose
 from pecan import rest
-import six
 
 import oslo_log.log as logging
 
@@ -321,7 +320,7 @@ class ServerController(rest.RestController):
 
         # Because metadata is processed in the bottom pod, we just do
         # parameter validation here to ensure quota management
-        for k, v in six.iteritems(metadata):
+        for k, v in metadata.items():
             try:
                 utils.check_string_length(v)
                 utils.check_string_length(k, min_len=1)

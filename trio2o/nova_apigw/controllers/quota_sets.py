@@ -13,7 +13,6 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import six
 
 from pecan import expose
 from pecan import request
@@ -63,7 +62,7 @@ def build_absolute_limits(quotas):
     }
 
     limits = {}
-    for display_name, key in six.iteritems(quota_map):
+    for display_name, key in quota_map.items():
         if key in quotas:
             limits[display_name] = quotas[key]['limit']
     return limits
@@ -82,7 +81,7 @@ def build_used_limits(quotas):
 
     # need to refresh usage from the bottom pods? Now from the data in top
     used_limits = {}
-    for display_name, key in six.iteritems(quota_map):
+    for display_name, key in quota_map.items():
         if key in quotas:
             reserved = quotas[key]['reserved']
             used_limits[display_name] = quotas[key]['in_use'] + reserved

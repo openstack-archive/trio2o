@@ -175,8 +175,7 @@ class Client(object):
             for resource in handle_obj.support_resource:
                 self.resource_service_map[resource] = handle_obj.service_type
                 self.operation_resources_map['client'].add(resource)
-                for operation, index in six.iteritems(
-                        resource_handle.operation_index_map):
+                for operation, index in resource_handle.operation_index_map.items():
                     # add parentheses to emphasize we mean to do bitwise and
                     if (handle_obj.support_resource[resource] & index) == 0:
                         continue
