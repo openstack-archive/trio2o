@@ -157,7 +157,7 @@ class VolumeController(rest.RestController):
         context = t_context.extract_context_from_environ()
 
         if _id == 'detail':
-            return {'volumes': self._get_all(context)}
+            return self._get_all(context)
 
         # TODO(joehuang): get the release of top and bottom
         t_release = cons.R_MITAKA
@@ -218,12 +218,14 @@ class VolumeController(rest.RestController):
         # now combined with 'detail'
 
         context = t_context.extract_context_from_environ()
-        return {'volumes': self._get_all(context)}
+        return self._get_all(context)
 
     def _get_all(self, context):
 
         # TODO(joehuang): query optimization for pagination, sort, etc
-        ret = []
+        ret = {}
+        ret['volumes'] = []
+
         pods = az_ag.list_pods_by_tenant(context, self.tenant_id)
         for pod in pods:
             if pod['pod_name'] == '':
@@ -278,7 +280,10 @@ class VolumeController(rest.RestController):
 
                         vol['availability_zone'] = pod['az_name']
 
-                    ret.extend(b_ret_body['volumes'])
+                    ret['volumes'] = b_ret_body['volumes']
+
+                if b_ret_body.get('volumes_links'):
+                    ret['volumes_links'] = b_ret_body['volumes_links']
         return ret
 
     @expose(generic=True, template='json')

@@ -396,7 +396,7 @@ class TestVolumeController(CinderVolumeFunctionalTest):
         self._test_and_check(tenant1_volumes, 'my_tenant_id')
         self._test_and_check(tenant2_volumes, 'my_tenant_id_2')
 
-        self._test_detail_check('my_tenant_id', 3)
+        self._test_detail_check('my_tenant_id', 1)
         self._test_detail_check('my_tenant_id_2', 1)
 
     @patch.object(hclient, 'forward_req',
