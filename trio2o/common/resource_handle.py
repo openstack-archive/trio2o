@@ -84,7 +84,7 @@ class GlanceResourceHandle(ResourceHandle):
     support_resource = {'image': LIST | GET}
 
     def _get_client(self, cxt):
-        return g_client.Client('1',
+        return g_client.Client('2',
                                token=cxt.auth_token,
                                auth_url=self.auth_url,
                                endpoint=self.endpoint_url,
@@ -105,7 +105,7 @@ class GlanceResourceHandle(ResourceHandle):
         try:
             client = self._get_client(cxt)
             collection = '%ss' % resource
-            return getattr(client, collection).get(resource_id).to_dict()
+            return getattr(client, collection).get(resource_id)
         except g_exceptions.InvalidEndpoint:
             self.endpoint_url = None
             raise exceptions.EndpointNotAvailable('glance',
