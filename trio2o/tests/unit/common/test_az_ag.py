@@ -133,6 +133,7 @@ class AZAGTest(unittest.TestCase):
             self.assertEqual(pod2['pod_name'], FAKE_SITE_NAME)
             self.assertEqual(pod2['pod_id'], FAKE_SITE_ID)
             self.assertEqual(pod2['az_name'], FAKE_AZ)
+
         else:
             self.assertEqual(pod2['pod_name'], FAKE_SITE_NAME_2)
             self.assertEqual(pod2['pod_id'], FAKE_SITE_ID_2)

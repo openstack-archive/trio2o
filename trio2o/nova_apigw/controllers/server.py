@@ -20,7 +20,6 @@ import six
 
 import oslo_log.log as logging
 
-from trio2o.common import az_ag
 import trio2o.common.client as t_client
 from trio2o.common import constants
 import trio2o.common.context as t_context
@@ -29,11 +28,13 @@ from trio2o.common.i18n import _
 from trio2o.common.i18n import _LE
 import trio2o.common.lock_handle as t_lock
 from trio2o.common.quota import QUOTAS
+from trio2o.common.scheduler import filter_scheduler
 from trio2o.common import utils
 from trio2o.common import xrpcapi
 import trio2o.db.api as db_api
 from trio2o.db import core
 from trio2o.db import models
+
 
 LOG = logging.getLogger(__name__)
 
@@ -47,6 +48,7 @@ class ServerController(rest.RestController):
         self.project_id = project_id
         self.clients = {constants.TOP: t_client.Client()}
         self.xjob_handler = xrpcapi.XJobAPI()
+        self.filter_scheduler = filter_scheduler.FilterScheduler()
 
     def _get_client(self, pod_name=constants.TOP):
         if pod_name not in self.clients:
@@ -112,9 +114,9 @@ class ServerController(rest.RestController):
                 400, _('server is not set'))
 
         az = kw['server'].get('availability_zone', '')
+        pod, b_az = self.filter_scheduler.select_destination(
+            context, az, self.project_id, pod_group='')
 
-        pod, b_az = az_ag.get_pod_by_az_tenant(
-            context, az, self.project_id)
         if not pod:
             return utils.format_nova_error(
                 500, _('Pod not configured or scheduling failure'))
