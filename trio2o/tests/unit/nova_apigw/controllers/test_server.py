@@ -26,6 +26,7 @@ from trio2o.common import constants
 from trio2o.common import context
 import trio2o.common.exceptions as t_exceptions
 from trio2o.common import lock_handle
+from trio2o.common.scheduler import filter_scheduler
 from trio2o.common import xrpcapi
 from trio2o.db import api
 from trio2o.db import core
@@ -82,6 +83,7 @@ class FakeServerController(server.ServerController):
         self.clients = {'t_region': FakeClient('t_region')}
         self.project_id = project_id
         self.xjob_handler = xrpcapi.XJobAPI()
+        self.filter_scheduler = filter_scheduler.FilterScheduler()
 
     def _get_client(self, pod_name=None):
         if not pod_name:

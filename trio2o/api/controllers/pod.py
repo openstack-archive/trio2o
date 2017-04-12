@@ -223,7 +223,6 @@ class BindingsController(rest.RestController):
         pod_b = kw['pod_binding']
         tenant_id = pod_b.get('tenant_id', '').strip()
         pod_id = pod_b.get('pod_id', '').strip()
-        _uuid = uuidutils.generate_uuid()
 
         if tenant_id == '' or pod_id == '':
             return Response(
@@ -249,11 +248,7 @@ class BindingsController(rest.RestController):
             return
 
         try:
-            with context.session.begin():
-                pod_binding = core.create_resource(context, models.PodBinding,
-                                                   {'id': _uuid,
-                                                    'tenant_id': tenant_id,
-                                                    'pod_id': pod_id})
+            pod_binding = db_api.create_pod_binding(context, tenant_id, pod_id)
         except db_exc.DBDuplicateEntry:
             return Response(_('Pod binding already exists'), 409)
         except db_exc.DBConstraintError:

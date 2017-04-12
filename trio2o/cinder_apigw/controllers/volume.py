@@ -29,6 +29,7 @@ import trio2o.common.context as t_context
 from trio2o.common import httpclient as hclient
 from trio2o.common.i18n import _
 from trio2o.common.i18n import _LE
+from trio2o.common.scheduler import filter_scheduler
 from trio2o.common import utils
 
 import trio2o.db.api as db_api
@@ -42,6 +43,7 @@ class VolumeController(rest.RestController):
 
     def __init__(self, tenant_id):
         self.tenant_id = tenant_id
+        self.filter_scheduler = filter_scheduler.FilterScheduler()
 
     @expose(generic=True, template='json')
     def post(self, **kw):
@@ -52,10 +54,9 @@ class VolumeController(rest.RestController):
                 400, _("Missing required element 'volume' in request body."))
 
         az = kw['volume'].get('availability_zone', '')
-        pod, pod_az = az_ag.get_pod_by_az_tenant(
-            context,
-            az_name=az,
-            tenant_id=self.tenant_id)
+        pod, pod_az = self.filter_scheduler.select_destination(
+            context, az, self.tenant_id, pod_group='')
+
         if not pod:
             LOG.error(_LE("Pod not configured or scheduling failure"))
             return utils.format_cinder_error(
