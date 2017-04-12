@@ -14,12 +14,12 @@
 #    under the License.
 
 from mock import patch
+from novaclient.client import SessionClient
 import pecan
 import unittest
 
 from oslo_utils import uuidutils
 
-from trio2o.common import client
 from trio2o.common import constants
 from trio2o.common import context
 from trio2o.common import exceptions
@@ -40,8 +40,9 @@ class ActionTest(unittest.TestCase):
     def setUp(self):
         core.initialize()
         core.ModelBase.metadata.create_all(core.get_engine())
-        self.context = context.get_admin_context()
+        self.context = context.Context()
         self.project_id = 'test_project'
+        self.context.tenant = self.project_id
         self.controller = action.ActionController(self.project_id, '')
 
     def _prepare_pod(self, bottom_pod_num=1):
@@ -62,6 +63,13 @@ class ActionTest(unittest.TestCase):
                 api.create_pod(self.context, b_pod)
                 b_pods.append(b_pod)
         return t_pod, b_pods
+
+    def _prepare_pod_service(self, pod_id, service):
+        config_dict = {'service_id': uuidutils.generate_uuid(),
+                       'pod_id': pod_id,
+                       'service_type': service,
+                       'service_url': 'fake_pod_service'}
+        api.create_pod_service_configuration(self.context, config_dict)
 
     def _prepare_server(self, pod):
         t_server_id = uuidutils.generate_uuid()
@@ -96,12 +104,13 @@ class ActionTest(unittest.TestCase):
         self._validate_error_code(res, 404)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_action_exception(self, mock_context, mock_action):
         mock_context.return_value = self.context
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
@@ -122,241 +131,356 @@ class ActionTest(unittest.TestCase):
         self._validate_error_code(res, 500)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_start_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'os-start': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'start', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_stop_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'os-stop': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'stop', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_force_delete_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'forceDelete': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'force_delete', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_lock_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'lock': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'lock', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_unlock_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'unlock': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'unlock', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_pause_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'pause': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'pause', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_unpause_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'unpause': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'unpause', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_suspend_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'suspend': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'suspend', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_resume_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'resume': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'resume', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_shelveOffload_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'shelveOffload': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'shelve_offload', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_shelve_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'shelve': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'shelve', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_unshelve_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'unshelve': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'unshelve', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_trigger_crash_dump_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'trigger_crash_dump': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'trigger_crash_dump', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     @patch.object(pecan, 'response', new=FakeResponse)
-    @patch.object(client.Client, 'action_resources')
+    @patch.object(SessionClient, 'post')
     @patch.object(context, 'extract_context_from_environ')
     def test_migrate_action(self, mock_context, mock_action):
         mock_context.return_value = self.context
         mock_action.return_value = (FakeResponse(202), None)
 
         t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
         t_server_id = self._prepare_server(b_pods[0])
         self.controller.server_id = t_server_id
 
         body = {'migrate': ''}
         res = self.controller.post(**body)
-        mock_action.assert_called_once_with(
-            'server', self.context, 'migrate', t_server_id)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
+        self.assertEqual(202, res.status)
+
+    @patch.object(pecan, 'response', new=FakeResponse)
+    @patch.object(SessionClient, 'post')
+    @patch.object(context, 'extract_context_from_environ')
+    def test_confirm_resize_action(self, mock_context, mock_action):
+        mock_context.return_value = self.context
+        mock_action.return_value = (FakeResponse(202), None)
+
+        t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
+        t_server_id = self._prepare_server(b_pods[0])
+        self.controller.server_id = t_server_id
+        body = {"confirmResize": ''}
+        res = self.controller.post(**body)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
+        self.assertEqual(202, res.status)
+
+    @patch.object(pecan, 'response', new=FakeResponse)
+    @patch.object(SessionClient, 'post')
+    @patch.object(context, 'extract_context_from_environ')
+    def test_revert_resize_action(self, mock_context, mock_action):
+        mock_context.return_value = self.context
+        mock_action.return_value = (FakeResponse(202), None)
+
+        t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
+        t_server_id = self._prepare_server(b_pods[0])
+        self.controller.server_id = t_server_id
+        body = {"revertResize": ''}
+        res = self.controller.post(**body)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
+        self.assertEqual(202, res.status)
+
+    @patch.object(pecan, 'response', new=FakeResponse)
+    @patch.object(SessionClient, 'post')
+    @patch.object(context, 'extract_context_from_environ')
+    def test_resize_action(self, mock_context, mock_action):
+        mock_context.return_value = self.context
+        mock_action.return_value = (FakeResponse(202), None)
+
+        t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
+        t_server_id = self._prepare_server(b_pods[0])
+        self.controller.server_id = t_server_id
+        body = {"resize": {"flavorRef": "2"}}
+        res = self.controller.post(**body)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
+        self.assertEqual(202, res.status)
+
+    @patch.object(pecan, 'response', new=FakeResponse)
+    @patch.object(SessionClient, 'post')
+    @patch.object(context, 'extract_context_from_environ')
+    def test_reset_state_action(self, mock_context, mock_action):
+        mock_context.return_value = self.context
+        mock_action.return_value = (FakeResponse(202), None)
+
+        t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
+        t_server_id = self._prepare_server(b_pods[0])
+        self.controller.server_id = t_server_id
+        body = {"os-resetState": {"state": "active"}}
+        res = self.controller.post(**body)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
+        self.assertEqual(202, res.status)
+
+    @patch.object(pecan, 'response', new=FakeResponse)
+    @patch.object(SessionClient, 'post')
+    @patch.object(context, 'extract_context_from_environ')
+    def test_soft_reboot_action(self, mock_context, mock_action):
+        mock_context.return_value = self.context
+        mock_action.return_value = (FakeResponse(202), None)
+
+        t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
+        t_server_id = self._prepare_server(b_pods[0])
+        self.controller.server_id = t_server_id
+        body = {"reboot": {"type": "SOFT"}}
+        res = self.controller.post(**body)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
+        self.assertEqual(202, res.status)
+
+    @patch.object(pecan, 'response', new=FakeResponse)
+    @patch.object(SessionClient, 'post')
+    @patch.object(context, 'extract_context_from_environ')
+    def test_hard_reboot_action(self, mock_context, mock_action):
+        mock_context.return_value = self.context
+        mock_action.return_value = (FakeResponse(202), None)
+        t_pod, b_pods = self._prepare_pod()
+        self._prepare_pod_service(b_pods[0]['pod_id'], constants.ST_NOVA)
+        t_server_id = self._prepare_server(b_pods[0])
+        self.controller.server_id = t_server_id
+        body = {"reboot": {"type": "HARD"}}
+        res = self.controller.post(**body)
+        url = '/servers/%s/action' % t_server_id
+        mock_action.assert_called_once_with(url, body=body)
         self.assertEqual(202, res.status)
 
     def tearDown(self):
