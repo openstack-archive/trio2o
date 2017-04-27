@@ -23,8 +23,8 @@ from oslo_log import log as logging
 from oslo_serialization import jsonutils
 
 from trio2o.common import az_ag
-from trio2o.db import core
 from trio2o.common import constants as cons
+
 import trio2o.common.context as t_context
 
 from trio2o.common import httpclient as hclient
@@ -34,6 +34,7 @@ from trio2o.common import utils
 
 import trio2o.db.api as db_api
 from trio2o.db import models
+from trio2o.db import core
 
 LOG = logging.getLogger(__name__)
 
