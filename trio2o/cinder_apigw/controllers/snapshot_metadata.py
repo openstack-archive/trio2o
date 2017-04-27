@@ -344,4 +344,3 @@ class SnapshotMetaDataController(rest.RestController):
         # remove the routing when query is executed but not found
         # No content in the resp actually
         return response
-

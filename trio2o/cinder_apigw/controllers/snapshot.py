@@ -23,10 +23,11 @@ from oslo_log import log as logging
 from oslo_serialization import jsonutils
 
 from trio2o.common import az_ag
+from trio2o.db import core
 from trio2o.common import constants as cons
 import trio2o.common.context as t_context
+
 from trio2o.common import httpclient as hclient
-from trio2o.db import core
 from trio2o.common.i18n import _
 from trio2o.common.i18n import _LE
 from trio2o.common import utils
@@ -406,4 +407,3 @@ class SnapshotController(rest.RestController):
         response.status = resp.status_code
 
         return response
-

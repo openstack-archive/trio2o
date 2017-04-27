@@ -17,12 +17,12 @@ import pecan
 
 import oslo_log.log as logging
 
+from trio2o.cinder_apigw.controllers import snapshot
+from trio2o.cinder_apigw.controllers import snapshot_metadata
 from trio2o.cinder_apigw.controllers import volume
 from trio2o.cinder_apigw.controllers import volume_actions
 from trio2o.cinder_apigw.controllers import volume_metadata
 from trio2o.cinder_apigw.controllers import volume_type
-from trio2o.cinder_apigw.controllers import snapshot
-from trio2o.cinder_apigw.controllers import snapshot_metadata
 
 LOG = logging.getLogger(__name__)
 
@@ -146,4 +146,3 @@ class V2Controller(object):
     @index.when(method='PATCH')
     def not_supported(self):
         pecan.abort(405)
-

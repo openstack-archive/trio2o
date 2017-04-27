@@ -17,14 +17,13 @@ from mock import patch
 import pecan
 import unittest
 
-from cinderclient.client import HTTPClient
 from oslo_serialization import jsonutils
 from oslo_utils import uuidutils
 
 from trio2o.cinder_apigw.controllers import snapshot as snapshot_test
 from trio2o.common import constants
 from trio2o.common import context
-from trio2o.common import httpclient as hclient
+from trio2o.common import httpclient
 from trio2o.db import api
 from trio2o.db import core
 from trio2o.db import models
@@ -120,9 +119,9 @@ class SnapshotTest(unittest.TestCase):
                  'resource_type': constants.RT_SERVER})
         return t_server_id
 
-    @patch.object(hclient, 'get_pod_service_ctx')
+    @patch.object(httpclient, 'get_pod_service_ctx')
     @patch.object(jsonutils, 'loads')
-    @patch.object(hclient, 'forward_req')
+    @patch.object(httpclient, 'forward_req')
     @patch.object(pecan, 'request')
     @patch.object(context, 'extract_context_from_environ')
     def test_post(self, mock_context, mock_request,
@@ -151,9 +150,9 @@ class SnapshotTest(unittest.TestCase):
         res = self.controller.post(**body)
         self.assertEqual(fake_resp, res)
 
-    @patch.object(hclient, 'get_pod_service_ctx')
+    @patch.object(httpclient, 'get_pod_service_ctx')
     @patch.object(jsonutils, 'loads')
-    @patch.object(hclient, 'forward_req')
+    @patch.object(httpclient, 'forward_req')
     @patch.object(pecan, 'request')
     @patch.object(context, 'extract_context_from_environ')
     def test_get_one(self, mock_context, mock_request,
@@ -172,9 +171,9 @@ class SnapshotTest(unittest.TestCase):
         res = self.controller.get_one(t_snapshot_id)
         self.assertEqual(fake_resp, res)
 
-    @patch.object(hclient, 'get_pod_service_ctx')
+    @patch.object(httpclient, 'get_pod_service_ctx')
     @patch.object(jsonutils, 'loads')
-    @patch.object(hclient, 'forward_req')
+    @patch.object(httpclient, 'forward_req')
     @patch.object(pecan, 'request')
     @patch.object(context, 'extract_context_from_environ')
     def test_get_all(self, mock_context, mock_request,
@@ -204,9 +203,9 @@ class SnapshotTest(unittest.TestCase):
         res = self.controller.get_all()
         self.assertEqual(fake_resp, res)
 
-    @patch.object(hclient, 'get_pod_service_ctx')
+    @patch.object(httpclient, 'get_pod_service_ctx')
     @patch.object(jsonutils, 'loads')
-    @patch.object(hclient, 'forward_req')
+    @patch.object(httpclient, 'forward_req')
     @patch.object(pecan, 'request')
     @patch.object(context, 'extract_context_from_environ')
     def test_put(self, mock_context, mock_request,
@@ -244,9 +243,9 @@ class SnapshotTest(unittest.TestCase):
         res = self.controller.put(t_snapshot_id, **body2)
         self.assertEqual(fake_resp, res)
 
-    @patch.object(hclient, 'get_pod_service_ctx')
+    @patch.object(httpclient, 'get_pod_service_ctx')
     @patch.object(jsonutils, 'loads')
-    @patch.object(hclient, 'forward_req')
+    @patch.object(httpclient, 'forward_req')
     @patch.object(pecan, 'request')
     @patch.object(context, 'extract_context_from_environ')
     def test_delete(self, mock_context, mock_request,
@@ -278,4 +277,3 @@ class SnapshotTest(unittest.TestCase):
 
     def tearDown(self):
         core.ModelBase.metadata.drop_all(core.get_engine())
-
