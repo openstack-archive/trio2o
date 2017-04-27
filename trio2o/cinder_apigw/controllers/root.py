@@ -98,14 +98,16 @@ class V2Controller(object):
             if sub_resource not in self.volumes_sub_controller:
                 pecan.abort(404)
                 return
-            return self.volumes_sub_controller[sub_resource](tenant_id, volume_id), remainder[3:]
+            return self.volumes_sub_controller[sub_resource] \
+                       (tenant_id, volume_id), remainder[3:]
         if resource == 'snapshots' and len(remainder) >= 3:
             snapshot_id = remainder[1]
             sub_resource = remainder[2]
             if sub_resource not in self.snapshots_sub_controller:
                 pecan.abort(404)
                 return
-            return self.snapshots_sub_controller[sub_resource](tenant_id, snapshot_id), remainder[3:]
+            return self.snapshots_sub_controller[sub_resource] \
+                       (tenant_id, snapshot_id), remainder[3:]
         return self.resource_controller[resource](tenant_id), remainder[1:]
 
     @pecan.expose(generic=True, template='json')
@@ -146,4 +148,3 @@ class V2Controller(object):
     @index.when(method='PATCH')
     def not_supported(self):
         pecan.abort(405)
-

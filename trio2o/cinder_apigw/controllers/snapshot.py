@@ -47,16 +47,21 @@ class SnapshotController(rest.RestController):
 
         if 'snapshot' not in kw:
             return utils.format_cinder_error(
-                400, _("Missing required element 'snapshot' in request body."))
+                400,
+                _("Missing required element 'snapshot' in request body."))
 
         volume_id = kw['snapshot']['volume_id']
         volume_mappings = db_api.get_bottom_mappings_by_top_id(
-            context, volume_id, cons.RT_VOLUME)
+            context,
+            volume_id,
+            cons.RT_VOLUME)
+
         if not volume_mappings:
             return utils.format_cinder_error(
-                404, _('Volume %(volume_id)s could not be found.') % {
-                    'volume_id': volume_id
-                })
+                404,
+                _('Volume %(volume_id)s could not be found.') %
+                {'volume_id': volume_id}
+            )
 
         pod_name = volume_mappings[0][0]['pod_name']
         t_release = cons.R_MITAKA
@@ -69,7 +74,8 @@ class SnapshotController(rest.RestController):
 
         if s_ctx['b_url'] == '':
             return utils.format_cinder_error(
-                404, _('Bottom Pod endpoint incorrect'))
+                404,
+                _('Bottom Pod endpoint incorrect'))
 
         b_headers = hclient.convert_header(t_release,
                                            b_release,
@@ -80,6 +86,7 @@ class SnapshotController(rest.RestController):
                                            b_release,
                                            t_vol,
                                            res_type=cons.RT_SNAPSHOT)
+
         b_body = jsonutils.dumps({'snapshot': b_vol_req})
 
         resp = hclient.forward_req(context,
@@ -114,7 +121,8 @@ class SnapshotController(rest.RestController):
                                    'pod_id': volume_mappings[0][0]['pod_id'],
                                    'exception': e})
                     return utils.format_cinder_error(
-                        500, _('Failed to create snapshot resource routing'))
+                        500,
+                        _('Failed to create snapshot resource routing'))
                 vol_ret = hclient.convert_object(t_release,
                                                  b_release,
                                                  b_snapshot,
@@ -135,31 +143,41 @@ class SnapshotController(rest.RestController):
         b_headers = hclient.convert_header(t_release,
                                            b_release,
                                            request.headers)
-        mappings = db_api.get_bottom_mappings_by_top_id(context, snapshot_id,
-                                                        cons.RT_SNAPSHOT)
+        mappings = db_api.get_bottom_mappings_by_top_id(
+            context,
+            snapshot_id,
+            cons.RT_SNAPSHOT)
         if not mappings:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404, _('snapshot %s could not be found.') %
+                     snapshot_id)
         pod = mappings[0][0]
         if not pod:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404, _('snapshot %s could not be found.') %
+                     snapshot_id)
         pod_name = pod['pod_name']
 
-        s_ctx = hclient.get_pod_service_ctx(context, request.url, pod_name,
+        s_ctx = hclient.get_pod_service_ctx(context,
+                                            request.url,
+                                            pod_name,
                                             s_type=cons.ST_CINDER)
         if not s_ctx:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404, _('snapshot %s could not be found.') %
+                     snapshot_id)
 
         if s_ctx['b_url'] == '':
             return utils.format_cinder_error(
-                404, _('Bottom Pod endpoint incorrect'))
+                404,
+                _('Bottom Pod endpoint incorrect'))
 
-        resp = hclient.forward_req(context, 'GET',
+        resp = hclient.forward_req(context,
+                                   'GET',
                                    b_headers,
                                    s_ctx['b_url'],
                                    request.body)
+
         b_ret_body = jsonutils.loads(resp.content)
 
         b_status = resp.status_code
@@ -167,7 +185,8 @@ class SnapshotController(rest.RestController):
         if b_status == 200:
             if b_ret_body.get('snapshot') is not None:
                 b_sps_ret = b_ret_body['snapshot']
-                ret_vol = hclient.convert_object(b_release, t_release,
+                ret_vol = hclient.convert_object(b_release,
+                                                 t_release,
                                                  b_sps_ret,
                                                  res_type=cons.RT_SNAPSHOT)
 
@@ -175,20 +194,25 @@ class SnapshotController(rest.RestController):
 
         # resource not find but routing exist, remove the routing
         if b_status == 404:
-            filters = [{'key': 'top_id', 'comparator': 'eq', 'value': snapshot_id},
+            filters = [{'key': 'top_id',
+                        'comparator': 'eq',
+                        'value': snapshot_id},
                        {'key': 'resource_type',
                         'comparator': 'eq',
                         'value': cons.RT_SNAPSHOT}]
             with context.session.begin():
-                core.delete_resources(context,
-                                      models.ResourceRouting,
-                                      filters)
+                core.delete_resources(
+                    context,
+                    models.ResourceRouting,
+                    filters)
+
         return b_ret_body
 
     @expose(generic=True, template='json')
     def get_all(self):
 
-        # Lists all Block Storage snapshots, with details, that the tenant can access.
+        # Lists all Block Storage snapshots, with details,
+        #  that the tenant can access.
         context = t_context.extract_context_from_environ()
         return {'snapshots': self._get_all(context)}
 
@@ -196,7 +220,8 @@ class SnapshotController(rest.RestController):
     def _get_all(self, context):
 
         ret = []
-        pods = az_ag.list_pods_by_tenant(context, self.tenant_id)
+        pods = az_ag.list_pods_by_tenant(context,
+                                         self.tenant_id)
         for pod in pods:
             if pod['pod_name'] == '':
                 continue
@@ -216,9 +241,11 @@ class SnapshotController(rest.RestController):
                 request.url,
                 pod['pod_name'],
                 s_type=cons.ST_CINDER)
+
             if s_ctx['b_url'] == '':
-                LOG.error(_LE("bottom pod endpoint incorrect %s")
-                          % pod['pod_name'])
+                LOG.error(
+                    _LE("bottom pod endpoint incorrect %s")
+                    % pod['pod_name'])
                 continue
 
             # get the release of top and bottom
@@ -260,26 +287,39 @@ class SnapshotController(rest.RestController):
         t_release = cons.R_MITAKA
         b_release = cons.R_MITAKA
 
-        mappings = db_api.get_bottom_mappings_by_top_id(context, snapshot_id,
-                                                        cons.RT_SNAPSHOT)
+        mappings = db_api.get_bottom_mappings_by_top_id(
+            context,
+            snapshot_id,
+            cons.RT_SNAPSHOT)
         if not mappings:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404,
+                _('snapshot %s could not be found.') %
+                snapshot_id)
+
         pod = mappings[0][0]
         if not pod:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404, _('snapshot %s could not be found.') %
+                     snapshot_id)
         pod_name = pod['pod_name']
 
-        s_ctx = hclient.get_pod_service_ctx(context, request.url, pod_name,
-                                            s_type=cons.ST_CINDER)
+        s_ctx = hclient.get_pod_service_ctx(
+            context,
+            request.url,
+            pod_name,
+            s_type=cons.ST_CINDER)
+
         if not s_ctx:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404,
+                _('snapshot %s could not be found.') %
+                snapshot_id)
 
         if s_ctx['b_url'] == '':
             return utils.format_cinder_error(
-                404, _('Bottom Pod endpoint incorrect'))
+                404,
+                _('Bottom Pod endpoint incorrect'))
 
         b_headers = hclient.convert_header(t_release,
                                            b_release,
@@ -287,8 +327,11 @@ class SnapshotController(rest.RestController):
 
         t_vol = kw['snapshot']
 
-        b_vol_req = hclient.convert_object(t_release, b_release, t_vol,
+        b_vol_req = hclient.convert_object(t_release,
+                                           b_release,
+                                           t_vol,
                                            res_type=cons.RT_SNAPSHOT)
+
         b_body = jsonutils.dumps({'snapshot': b_vol_req})
         resp = hclient.forward_req(context, 'PUT',
                                    b_headers,
@@ -302,7 +345,8 @@ class SnapshotController(rest.RestController):
         if b_status == 200:
             if b_ret_body.get('snapshot') is not None:
                 b_vol_ret = b_ret_body['snapshot']
-                ret_vol = hclient.convert_object(b_release, t_release,
+                ret_vol = hclient.convert_object(b_release,
+                                                 t_release,
                                                  b_vol_ret,
                                                  res_type=cons.RT_SNAPSHOT)
 
@@ -310,7 +354,9 @@ class SnapshotController(rest.RestController):
 
         # resource not found but routing exist, remove the routing
         if b_status == 404:
-            filters = [{'key': 'top_id', 'comparator': 'eq', 'value': snapshot_id},
+            filters = [{'key': 'top_id',
+                        'comparator': 'eq',
+                        'value': snapshot_id},
                        {'key': 'resource_type',
                         'comparator': 'eq',
                         'value': cons.RT_SNAPSHOT}]
@@ -327,22 +373,30 @@ class SnapshotController(rest.RestController):
         t_release = cons.R_MITAKA
         b_release = cons.R_MITAKA
 
-        mappings = db_api.get_bottom_mappings_by_top_id(context, snapshot_id,
-                                                        cons.RT_SNAPSHOT)
+        mappings = db_api.get_bottom_mappings_by_top_id(
+            context,
+            snapshot_id,
+            cons.RT_SNAPSHOT)
+
         if not mappings:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404, _('snapshot %s could not be found.') %
+                     snapshot_id)
         pod = mappings[0][0]
         if not pod:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404, _('snapshot %s could not be found.') %
+                     snapshot_id)
         pod_name = pod['pod_name']
 
-        s_ctx = hclient.get_pod_service_ctx(context, request.url, pod_name,
+        s_ctx = hclient.get_pod_service_ctx(context,
+                                            request.url,
+                                            pod_name,
                                             s_type=cons.ST_CINDER)
         if not s_ctx:
             return utils.format_cinder_error(
-                404, _('snapshot %s could not be found.') % snapshot_id)
+                404, _('snapshot %s could not be found.') %
+                     snapshot_id)
 
         if s_ctx['b_url'] == '':
             return utils.format_cinder_error(
@@ -351,7 +405,8 @@ class SnapshotController(rest.RestController):
         b_headers = hclient.convert_header(t_release,
                                            b_release,
                                            request.headers)
-        resp = hclient.forward_req(context, 'DELETE',
+        resp = hclient.forward_req(context,
+                                   'DELETE',
                                    b_headers,
                                    s_ctx['b_url'],
                                    request.body)
@@ -359,4 +414,3 @@ class SnapshotController(rest.RestController):
         response.status = resp.status_code
 
         return response
-
