@@ -28,11 +28,11 @@ LOG = logging.getLogger(__name__)
 
 class Trio2oException(Exception):
     """Base Trio2o Exception.
-
     To correctly use this class, inherit from it and define
     a 'message' property. That message will get printf'd
     with the keyword arguments provided to the constructor.
     """
+
     message = _("An unknown exception occurred.")
     code = 500
     headers = {}
@@ -303,3 +303,11 @@ class VolumeTypeExists(Duplicate):
 
 class VolumeTypeUpdateFailed(Trio2oException):
     message = _("Cannot update volume_type %(id)s")
+
+
+class ServerMappingsNotFound(NotFound):
+    message = _('Instance %(server_id)s could not be found.')
+
+
+class VolumeMappingsNotFound(NotFound):
+    message = _('Volume %(volume_id)s could not be found')
