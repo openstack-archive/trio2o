@@ -33,8 +33,8 @@ from trio2o.nova_apigw.controllers import image
 from trio2o.nova_apigw.controllers import network
 from trio2o.nova_apigw.controllers import quota_sets
 from trio2o.nova_apigw.controllers import server
+from trio2o.nova_apigw.controllers import servers_ips
 from trio2o.nova_apigw.controllers import volume
-
 
 LOG = logging.getLogger(__name__)
 
@@ -72,7 +72,8 @@ class V21Controller(object):
         }
         self.server_sub_controller = {
             'os-volume_attachments': volume.VolumeController,
-            'action': action.ActionController
+            'action': action.ActionController,
+            'ips': servers_ips.ServerIpsController
         }
 
     def _get_resource_controller(self, project_id, remainder):
