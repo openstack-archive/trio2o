@@ -14,7 +14,7 @@
 #    under the License.
 
 """
-Trio2o base exception handling.
+Tricircle base exception handling.
 """
 
 import six
@@ -26,8 +26,8 @@ from trio2o.common.i18n import _LE
 LOG = logging.getLogger(__name__)
 
 
-class Trio2oException(Exception):
-    """Base Trio2o Exception.
+class TricircleException(Exception):
+    """Base Tricircle Exception.
 
     To correctly use this class, inherit from it and define
     a 'message' property. That message will get printf'd
@@ -83,7 +83,7 @@ class Trio2oException(Exception):
             message = six.text_type(message)
 
         self.msg = message
-        super(Trio2oException, self).__init__(message)
+        super(TricircleException, self).__init__(message)
 
     def _should_format(self):
 
@@ -97,25 +97,25 @@ class Trio2oException(Exception):
         return six.text_type(self.msg)
 
 
-class BadRequest(Trio2oException):
+class BadRequest(TricircleException):
     message = _('Bad %(resource)s request: %(msg)s')
 
 
-class NotFound(Trio2oException):
+class NotFound(TricircleException):
     message = _("Resource could not be found.")
     code = 404
     safe = True
 
 
-class Conflict(Trio2oException):
+class Conflict(TricircleException):
     pass
 
 
-class NotAuthorized(Trio2oException):
+class NotAuthorized(TricircleException):
     message = _("Not authorized.")
 
 
-class ServiceUnavailable(Trio2oException):
+class ServiceUnavailable(TricircleException):
     message = _("The service is unavailable")
 
 
@@ -127,37 +127,37 @@ class PolicyNotAuthorized(NotAuthorized):
     message = _("Policy doesn't allow this operation to be performed.")
 
 
-class InUse(Trio2oException):
+class InUse(TricircleException):
     message = _("The resource is inuse")
 
 
-class InvalidConfigurationOption(Trio2oException):
+class InvalidConfigurationOption(TricircleException):
     message = _("An invalid value was provided for %(opt_name)s: "
                 "%(opt_value)s")
 
 
-class EndpointNotAvailable(Trio2oException):
+class EndpointNotAvailable(TricircleException):
     message = "Endpoint %(url)s for %(service)s is not available"
 
     def __init__(self, service, url):
         super(EndpointNotAvailable, self).__init__(service=service, url=url)
 
 
-class EndpointNotUnique(Trio2oException):
+class EndpointNotUnique(TricircleException):
     message = "Endpoint for %(service)s in %(pod)s not unique"
 
     def __init__(self, pod, service):
         super(EndpointNotUnique, self).__init__(pod=pod, service=service)
 
 
-class EndpointNotFound(Trio2oException):
+class EndpointNotFound(TricircleException):
     message = "Endpoint for %(service)s in %(pod)s not found"
 
     def __init__(self, pod, service):
         super(EndpointNotFound, self).__init__(pod=pod, service=service)
 
 
-class ResourceNotFound(Trio2oException):
+class ResourceNotFound(TricircleException):
     message = "Could not find %(resource_type)s: %(unique_key)s"
 
     def __init__(self, model, unique_key):
@@ -166,7 +166,7 @@ class ResourceNotFound(Trio2oException):
                                                unique_key=unique_key)
 
 
-class ResourceNotSupported(Trio2oException):
+class ResourceNotSupported(TricircleException):
     message = "%(method)s method not supported for %(resource)s"
 
     def __init__(self, resource, method):
@@ -174,7 +174,7 @@ class ResourceNotSupported(Trio2oException):
                                                    method=method)
 
 
-class Invalid(Trio2oException):
+class Invalid(TricircleException):
     message = _("Unacceptable parameters.")
     code = 400
 
@@ -191,7 +191,7 @@ class InvalidMetadataSize(Invalid):
     message = _("Invalid metadata size: %(reason)s")
 
 
-class MetadataLimitExceeded(Trio2oException):
+class MetadataLimitExceeded(TricircleException):
     message = _("Maximum number of metadata items exceeds %(allowed)d")
 
 
@@ -228,16 +228,16 @@ class ReservationNotFound(QuotaNotFound):
     message = _("Quota reservation %(uuid)s could not be found.")
 
 
-class OverQuota(Trio2oException):
+class OverQuota(TricircleException):
     message = _("Quota exceeded for resources: %(overs)s")
 
 
-class TooManyInstances(Trio2oException):
+class TooManyInstances(TricircleException):
     message = _("Quota exceeded for %(overs)s: Requested %(req)s,"
                 " but already used %(used)s of %(allowed)s %(overs)s")
 
 
-class OnsetFileLimitExceeded(Trio2oException):
+class OnsetFileLimitExceeded(TricircleException):
     message = _("Personality file limit exceeded")
 
 
@@ -249,7 +249,7 @@ class OnsetFileContentLimitExceeded(OnsetFileLimitExceeded):
     message = _("Personality file content too long")
 
 
-class ExternalNetPodNotSpecify(Trio2oException):
+class ExternalNetPodNotSpecify(TricircleException):
     message = "Pod for external network not specified"
 
     def __init__(self):
@@ -263,18 +263,18 @@ class PodNotFound(NotFound):
         super(PodNotFound, self).__init__(pod_name=pod_name)
 
 
-class ChildQuotaNotZero(Trio2oException):
+class ChildQuotaNotZero(TricircleException):
     message = _("Child projects having non-zero quota")
 
 
 # parameter validation error
-class ValidationError(Trio2oException):
+class ValidationError(TricircleException):
     message = _("%(msg)s")
     code = 400
 
 
 # parameter validation error
-class HTTPForbiddenError(Trio2oException):
+class HTTPForbiddenError(TricircleException):
     message = _("%(msg)s")
     code = 403
 
@@ -293,7 +293,7 @@ class VolumeTypeExtraSpecsNotFound(NotFound):
                 "key %(extra_specs_key)s.")
 
 
-class Duplicate(Trio2oException):
+class Duplicate(TricircleException):
     pass
 
 
@@ -301,5 +301,13 @@ class VolumeTypeExists(Duplicate):
     message = _("Volume Type %(id)s already exists.")
 
 
-class VolumeTypeUpdateFailed(Trio2oException):
+class VolumeTypeUpdateFailed(TricircleException):
     message = _("Cannot update volume_type %(id)s")
+
+
+class ServerMappingsNotFound(NotFound):
+    message = _('Instance %(server_id)s could not be found.')
+
+
+class VolumeMappingsNotFound(NotFound):
+    message = _('Volume %(volume_id)s could not be found')
