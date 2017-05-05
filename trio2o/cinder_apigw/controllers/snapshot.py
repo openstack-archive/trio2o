@@ -126,5 +126,4 @@ class SnapshotController(rest.RestController):
                                                  b_snapshot,
                                                  res_type=cons.RT_SNAPSHOT)
                 return {'snapshot': vol_ret}
-
         return b_ret_body
