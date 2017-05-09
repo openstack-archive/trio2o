@@ -27,6 +27,28 @@ echo "Running Trio2o functional test suite..."
 TESTCASES="(tempest.api.volume.test_volumes_list"
 TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_get"
 TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test.test_volume_backup_create_get_detailed_list_restore_delete"
+TESTCASES="$TESTCASES|tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_create_get_delete_snapshot_metadata"
+TESTCASES="$TESTCASES|tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_update_snapshot_metadata"
+TESTCASES="$TESTCASES|tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_update_snapshot_metadata_item"
+TESTCASES="$TESTCASES|tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_create_get_delete_snapshot_metadata"
+TESTCASES="$TESTCASES|tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_update_snapshot_metadata"
+TESTCASES="$TESTCASES|tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_update_snapshot_metadata_item"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_create_get_list_update_delete"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_create_with_volume_in_use"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit_equals_infinite"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit_equals_zero"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshots_list_details_with_params"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshots_list_with_params"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_volume_from_snapshot"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_create_get_list_update_delete"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_create_with_volume_in_use"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit_equals_infinite"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit_equals_zero"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshots_list_details_with_params"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshots_list_with_params"
+TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_volume_from_snapshot"
 # add new test cases like following line for volume_type test
 # TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_type"
 TESTCASES="$TESTCASES)"
@@ -181,12 +203,12 @@ ostestr --regex $TESTCASES
 # tempest.api.volume.test_qos.QosSpecsV2TestJSON.test_get_qos[id-7aa214cc-ac1a-4397-931f-3bb2e83bb0fd]
 # tempest.api.volume.test_qos.QosSpecsV2TestJSON.test_list_qos[id-75e04226-bcf7-4595-a34b-fdf0736f38fc]
 # tempest.api.volume.test_qos.QosSpecsV2TestJSON.test_set_unset_qos_key[id-ed00fd85-4494-45f2-8ceb-9e2048919aed]
-# tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_create_get_delete_snapshot_metadata[id-a2f20f99-e363-4584-be97-bc33afb1a56c]
-# tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_update_snapshot_metadata[id-bd2363bc-de92-48a4-bc98-28943c6e4be1]
-# tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_update_snapshot_metadata_item[id-e8ff85c5-8f97-477f-806a-3ac364a949ed]
-# tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_create_get_delete_snapshot_metadata[id-a2f20f99-e363-4584-be97-bc33afb1a56c]
-# tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_update_snapshot_metadata[id-bd2363bc-de92-48a4-bc98-28943c6e4be1]
-# tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_update_snapshot_metadata_item[id-e8ff85c5-8f97-477f-806a-3ac364a949ed]
+# **DONE** tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_create_get_delete_snapshot_metadata[id-a2f20f99-e363-4584-be97-bc33afb1a56c]
+# **DONE** tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_update_snapshot_metadata[id-bd2363bc-de92-48a4-bc98-28943c6e4be1]
+# **DONE** tempest.api.volume.test_snapshot_metadata.SnapshotV1MetadataTestJSON.test_update_snapshot_metadata_item[id-e8ff85c5-8f97-477f-806a-3ac364a949ed]
+# **DONE** tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_create_get_delete_snapshot_metadata[id-a2f20f99-e363-4584-be97-bc33afb1a56c]
+# **DONE** tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_update_snapshot_metadata[id-bd2363bc-de92-48a4-bc98-28943c6e4be1]
+# **DONE** tempest.api.volume.test_snapshot_metadata.SnapshotV2MetadataTestJSON.test_update_snapshot_metadata_item[id-e8ff85c5-8f97-477f-806a-3ac364a949ed]
 # tempest.api.volume.test_volume_metadata.VolumesV1MetadataTest.test_create_get_delete_volume_metadata[id-6f5b125b-f664-44bf-910f-751591fe5769]
 # tempest.api.volume.test_volume_metadata.VolumesV1MetadataTest.test_update_volume_metadata[id-774d2918-9beb-4f30-b3d1-2a4e8179ec0a]
 # tempest.api.volume.test_volume_metadata.VolumesV1MetadataTest.test_update_volume_metadata_item[id-862261c5-8df4-475a-8c21-946e50e36a20]
@@ -301,22 +323,22 @@ ostestr --regex $TESTCASES
 # tempest.api.volume.test_volumes_negative.VolumesV2NegativeTest.test_volume_extend_with_size_smaller_than_original_size[id-e0c75c74-ee34-41a9-9288-2a2051452854,negative]
 # tempest.api.volume.test_volumes_negative.VolumesV2NegativeTest.test_volume_extend_without_passing_volume_id[id-aff8ba64-6d6f-4f2e-bc33-41a08ee9f115,negative]
 # tempest.api.volume.test_volumes_negative.VolumesV2NegativeTest.test_volume_get_nonexistent_volume_id[id-f131c586-9448-44a4-a8b0-54ca838aa43e,negative]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_create_get_list_update_delete[id-2a8abbe4-d871-46db-b049-c41f5af8216e]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_create_with_volume_in_use[compute,id-b467b54c-07a4-446d-a1cf-651dedcc3ff1]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit[id-db4d8e0a-7a2e-41cc-a712-961f6844e896]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit_equals_infinite[id-a1427f61-420e-48a5-b6e3-0b394fa95400]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit_equals_zero[id-e3b44b7f-ae87-45b5-8a8c-66110eb24d0a]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshots_list_details_with_params[id-220a1022-1fcd-4a74-a7bd-6b859156cda2]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshots_list_with_params[id-59f41f43-aebf-48a9-ab5d-d76340fab32b]
-# tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_volume_from_snapshot[id-677863d1-3142-456d-b6ac-9924f667a7f4]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_create_get_list_update_delete[id-2a8abbe4-d871-46db-b049-c41f5af8216e]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_create_with_volume_in_use[compute,id-b467b54c-07a4-446d-a1cf-651dedcc3ff1]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit[id-db4d8e0a-7a2e-41cc-a712-961f6844e896]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit_equals_infinite[id-a1427f61-420e-48a5-b6e3-0b394fa95400]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit_equals_zero[id-e3b44b7f-ae87-45b5-8a8c-66110eb24d0a]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshots_list_details_with_params[id-220a1022-1fcd-4a74-a7bd-6b859156cda2]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshots_list_with_params[id-59f41f43-aebf-48a9-ab5d-d76340fab32b]
-# tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_volume_from_snapshot[id-677863d1-3142-456d-b6ac-9924f667a7f4]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_create_get_list_update_delete[id-2a8abbe4-d871-46db-b049-c41f5af8216e]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_create_with_volume_in_use[compute,id-b467b54c-07a4-446d-a1cf-651dedcc3ff1]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit[id-db4d8e0a-7a2e-41cc-a712-961f6844e896]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit_equals_infinite[id-a1427f61-420e-48a5-b6e3-0b394fa95400]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshot_list_param_limit_equals_zero[id-e3b44b7f-ae87-45b5-8a8c-66110eb24d0a]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshots_list_details_with_params[id-220a1022-1fcd-4a74-a7bd-6b859156cda2]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_snapshots_list_with_params[id-59f41f43-aebf-48a9-ab5d-d76340fab32b]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV1SnapshotTestJSON.test_volume_from_snapshot[id-677863d1-3142-456d-b6ac-9924f667a7f4]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_create_get_list_update_delete[id-2a8abbe4-d871-46db-b049-c41f5af8216e]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_create_with_volume_in_use[compute,id-b467b54c-07a4-446d-a1cf-651dedcc3ff1]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit[id-db4d8e0a-7a2e-41cc-a712-961f6844e896]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit_equals_infinite[id-a1427f61-420e-48a5-b6e3-0b394fa95400]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshot_list_param_limit_equals_zero[id-e3b44b7f-ae87-45b5-8a8c-66110eb24d0a]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshots_list_details_with_params[id-220a1022-1fcd-4a74-a7bd-6b859156cda2]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_snapshots_list_with_params[id-59f41f43-aebf-48a9-ab5d-d76340fab32b]
+# **DONE** tempest.api.volume.test_volumes_snapshots.VolumesV2SnapshotTestJSON.test_volume_from_snapshot[id-677863d1-3142-456d-b6ac-9924f667a7f4]
 # tempest.api.volume.test_volumes_snapshots_negative.VolumesV1SnapshotNegativeTestJSON.test_create_snapshot_with_nonexistent_volume_id[id-e3e466af-70ab-4f4b-a967-ab04e3532ea7,negative]
 # tempest.api.volume.test_volumes_snapshots_negative.VolumesV1SnapshotNegativeTestJSON.test_create_snapshot_without_passing_volume_id[id-bb9da53e-d335-4309-9c15-7e76fd5e4d6d,negative]
 # tempest.api.volume.test_volumes_snapshots_negative.VolumesV2SnapshotNegativeTestJSON.test_create_snapshot_with_nonexistent_volume_id[id-e3e466af-70ab-4f4b-a967-ab04e3532ea7,negative]
