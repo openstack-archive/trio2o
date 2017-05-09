@@ -18,6 +18,7 @@ import pecan
 import oslo_log.log as logging
 
 from trio2o.cinder_apigw.controllers import snapshot
+from trio2o.cinder_apigw.controllers import snapshot_metadata
 from trio2o.cinder_apigw.controllers import volume
 from trio2o.cinder_apigw.controllers import volume_actions
 from trio2o.cinder_apigw.controllers import volume_metadata
@@ -76,6 +77,10 @@ class V2Controller(object):
             'action': volume_actions.VolumeActionController
         }
 
+        self.snapshots_sub_controller = {
+            'metadata': snapshot_metadata.SnapshotMetaDataController
+        }
+
     @pecan.expose()
     def _lookup(self, tenant_id, *remainder):
         if not remainder:
@@ -93,6 +98,14 @@ class V2Controller(object):
                 return
             return self.volumes_sub_controller[sub_resource](
                 tenant_id, volume_id), remainder[3:]
+        if resource == 'snapshots' and len(remainder) >= 3:
+            snapshot_id = remainder[1]
+            sub_resource = remainder[2]
+            if sub_resource not in self.snapshots_sub_controller:
+                pecan.abort(404)
+                return
+            return self.snapshots_sub_controller[sub_resource](
+                tenant_id, snapshot_id), remainder[3:]
         return self.resource_controller[resource](tenant_id), remainder[1:]
 
     @pecan.expose(generic=True, template='json')
