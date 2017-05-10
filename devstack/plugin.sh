@@ -117,6 +117,8 @@ function init_common_trio2o_conf {
     iniset $conf_file DEFAULT use_syslog $SYSLOG
     iniset $conf_file DEFAULT trio2o_db_connection `database_connection_url trio2o`
 
+    iniset $conf_file client auth_url http://$KEYSTONE_SERVICE_HOST/identity
+    iniset $conf_file client identity_url http://$KEYSTONE_SERVICE_HOST/identity/v3
     iniset $conf_file client admin_username admin
     iniset $conf_file client admin_password $ADMIN_PASSWORD
     iniset $conf_file client admin_tenant demo
@@ -251,8 +253,8 @@ function move_neutron_server {
     stop_process q-svc
     # remove previous failure flag file since we are going to restart service
     rm -f "$SERVICE_DIR/$SCREEN_NAME"/q-svc.failure
-    sleep 20
     enable_service q-svc
+    sleep 20
     run_process q-svc "$NEUTRON_BIN_DIR/neutron-server --config-file $NEUTRON_CONF --config-file /$Q_PLUGIN_CONF_FILE"
 }
 
@@ -284,6 +286,13 @@ elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
 
 elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
     echo_summary "Initializing Trio2o Service"
+
+    if [[ ${USE_VENV} = True ]]; then
+        PROJECT_VENV["trio2o"]=${TRIO2O_DIR}.venv
+        TRIO2O_BIN_DIR=${PROJECT_VENV["trio2o"]}/bin
+    else
+        TRIO2O_BIN_DIR=$(get_python_exec_prefix)
+    fi
 
     if is_service_enabled t-api; then
 
