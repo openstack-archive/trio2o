@@ -117,6 +117,8 @@ function init_common_trio2o_conf {
     iniset $conf_file DEFAULT use_syslog $SYSLOG
     iniset $conf_file DEFAULT trio2o_db_connection `database_connection_url trio2o`
 
+    iniset $conf_file client auth_url http://$KEYSTONE_SERVICE_HOST/identity
+    iniset $conf_file client identity_url http://$KEYSTONE_SERVICE_HOST/identity/v3
     iniset $conf_file client admin_username admin
     iniset $conf_file client admin_password $ADMIN_PASSWORD
     iniset $conf_file client admin_tenant demo
@@ -194,6 +196,69 @@ function configure_trio2o_cinder_apigw {
         fi
 
     fi
+}
+
+# configure_trio2o_api_wsgi() - Set WSGI config files
+function configure_trio2o_api_wsgi {
+    local trio2o_api_apache_conf
+    local venv_path=""
+    local trio2o_bin_dir=""
+    local trio2o_ssl_listen="#"
+
+    trio2o_bin_dir=$(get_python_exec_prefix)
+    trio2o_api_apache_conf=$(apache_site_config_for trio2o-api)
+
+    if is_ssl_enabled_service "trio2o-api"; then
+        trio2o_ssl_listen=""
+        trio2o_ssl="SSLEngine On"
+        trio2o_certfile="SSLCertificateFile $TRIO2O_SSL_CERT"
+        trio2o_keyfile="SSLCertificateKeyFile $TRIO2O_SSL_KEY"
+    fi
+
+    # configure venv bin if VENV is used
+    if [[ ${USE_VENV} = True ]]; then
+        venv_path="python-path=${PROJECT_VENV["trio2o"]}/lib/$(python_version)/site-packages"
+        trio2o_bin_dir=${PROJECT_VENV["trio2o"]}/bin
+    fi
+
+    sudo cp $TRIO2O_API_APACHE_TEMPLATE $trio2o_api_apache_conf
+    sudo sed -e "
+        s|%TRIO2O_BIN%|$trio2o_bin_dir|g;
+        s|%PUBLICPORT%|$TRIO2O_API_PORT|g;
+        s|%APACHE_NAME%|$APACHE_NAME|g;
+        s|%PUBLICWSGI%|$trio2o_bin_dir/trio2o-api-wsgi|g;
+        s|%SSLENGINE%|$trio2o_ssl|g;
+        s|%SSLCERTFILE%|$trio2o_certfile|g;
+        s|%SSLKEYFILE%|$trio2o_keyfile|g;
+        s|%SSLLISTEN%|$trio2o_ssl_listen|g;
+        s|%USER%|$STACK_USER|g;
+        s|%VIRTUALENV%|$venv_path|g
+        s|%APIWORKERS%|$API_WORKERS|g
+    " -i $trio2o_api_apache_conf
+}
+
+# start_trio2o_api_wsgi() - Start the API processes ahead of other things
+function start_trio2o_api_wsgi {
+    enable_apache_site trio2o-api
+    restart_apache_server
+    tail_log trio2o-api /var/log/$APACHE_NAME/trio2o-api.log
+
+    echo "Waiting for trio2o-api to start..."
+    if ! wait_for_service $SERVICE_TIMEOUT $TRIO2O_API_PROTOCOL://$TRIO2O_API_HOST/trio2o; then
+        die $LINENO "trio2o-api did not start"
+    fi
+}
+
+# stop_trio2o_api_wsgi() - Disable the api service and stop it.
+function stop_trio2o_api_wsgi {
+    disable_apache_site trio2o-api
+    restart_apache_server
+}
+
+# cleanup_trio2o_api_wsgi() - Remove residual data files, anything left over from previous
+# runs that a clean run would need to clean up
+function cleanup_trio2o_api_wsgi {
+    sudo rm -f $(apache_site_config_for trio2o-api)
 }
 
 function configure_trio2o_xjob {
@@ -275,38 +340,56 @@ elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
     configure_trio2o_cinder_apigw
     configure_trio2o_xjob
 
+    if [[ "$TRIO2O_DEPLOY_WITH_WSGI" == "True" ]]; then
+        configure_trio2o_api_wsgi
+    fi
+
     echo export PYTHONPATH=\$PYTHONPATH:$TRIO2O_DIR >> $RC_DIR/.localrc.auto
 
     setup_package $TRIO2O_DIR -e
 
     recreate_database trio2o
-    python "$TRIO2O_DIR/cmd/manage.py" "$TRIO2O_API_CONF"
+    trio2o-db-manage --config-file="$TRIO2O_API_CONF" db_sync
 
 elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
     echo_summary "Initializing Trio2o Service"
+
+    if [[ ${USE_VENV} = True ]]; then
+        PROJECT_VENV["trio2o"]=${TRIO2O_DIR}.venv
+        TRIO2O_BIN_DIR=${PROJECT_VENV["trio2o"]}/bin
+    else
+        TRIO2O_BIN_DIR=$(get_python_exec_prefix)
+    fi
 
     if is_service_enabled t-api; then
 
         create_trio2o_accounts
 
-        run_process t-api "python $TRIO2O_API --config-file $TRIO2O_API_CONF"
+        if [[ "$TRIO2O_DEPLOY_WITH_WSGI" == "True" ]]; then
+            start_trio2o_api_wsgi
+        else
+            run_process t-api "$TRIO2O_BIN_DIR/trio2o-api --config-file $TRIO2O_API_CONF"
+        fi
     fi
 
     if is_service_enabled t-ngw; then
 
         create_nova_apigw_accounts
 
-        run_process t-ngw "python $TRIO2O_NOVA_APIGW --config-file $TRIO2O_NOVA_APIGW_CONF"
+        run_process t-ngw "$TRIO2O_BIN_DIR/trio2o-nova-apigw --config-file $TRIO2O_NOVA_APIGW_CONF"
 
-        reconfigure_nova
-
+        get_or_create_endpoint "compute" \
+            "$POD_REGION_NAME" \
+            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
+            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
+            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s'
     fi
 
     if is_service_enabled t-cgw; then
 
         create_cinder_apigw_accounts
 
-        run_process t-cgw "python $TRIO2O_CINDER_APIGW --config-file $TRIO2O_CINDER_APIGW_CONF"
+        run_process t-cgw "$TRIO2O_BIN_DIR/trio2o-cinder-apigw --config-file $TRIO2O_CINDER_APIGW_CONF"
 
         get_or_create_endpoint "volumev2" \
             "$POD_REGION_NAME" \
@@ -317,14 +400,19 @@ elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
 
     if is_service_enabled t-job; then
 
-        run_process t-job "python $TRIO2O_XJOB --config-file $TRIO2O_XJOB_CONF"
+        run_process t-job "$TRIO2O_BIN_DIR/trio2o-xjob --config-file $TRIO2O_XJOB_CONF"
     fi
 fi
 
 if [[ "$1" == "unstack" ]]; then
 
     if is_service_enabled t-api; then
-       stop_process t-api
+       if [[ "$TRIO2O_DEPLOY_WITH_WSGI" == "True" ]]; then
+            stop_trio2o_api_wsgi
+            clean_trio2o_api_wsgi
+        else
+            stop_process t-api
+        fi
     fi
 
     if is_service_enabled t-ngw; then
