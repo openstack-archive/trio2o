@@ -117,6 +117,8 @@ function init_common_trio2o_conf {
     iniset $conf_file DEFAULT use_syslog $SYSLOG
     iniset $conf_file DEFAULT trio2o_db_connection `database_connection_url trio2o`
 
+    iniset $conf_file client auth_url http://$KEYSTONE_SERVICE_HOST/identity
+    iniset $conf_file client identity_url http://$KEYSTONE_SERVICE_HOST/identity/v3
     iniset $conf_file client admin_username admin
     iniset $conf_file client admin_password $ADMIN_PASSWORD
     iniset $conf_file client admin_tenant demo
@@ -252,7 +254,6 @@ function move_neutron_server {
     # remove previous failure flag file since we are going to restart service
     rm -f "$SERVICE_DIR/$SCREEN_NAME"/q-svc.failure
     sleep 20
-    enable_service q-svc
     run_process q-svc "$NEUTRON_BIN_DIR/neutron-server --config-file $NEUTRON_CONF --config-file /$Q_PLUGIN_CONF_FILE"
 }
 
@@ -285,18 +286,25 @@ elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
 elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
     echo_summary "Initializing Trio2o Service"
 
+    if [[ ${USE_VENV} = True ]]; then
+        PROJECT_VENV["trio2o"]=${TRIO2O_DIR}.venv
+        TRIO2O_BIN_DIR=${PROJECT_VENV["trio2o"]}/bin
+    else
+        TRIO2O_BIN_DIR=$(get_python_exec_prefix)
+    fi
+
     if is_service_enabled t-api; then
 
         create_trio2o_accounts
 
-        run_process t-api "python $TRIO2O_API --config-file $TRIO2O_API_CONF"
+        run_process t-api "$TRIO2O_BIN_DIR/trio2o-api --config-file $TRIO2O_API_CONF"
     fi
 
     if is_service_enabled t-ngw; then
 
         create_nova_apigw_accounts
 
-        run_process t-ngw "python $TRIO2O_NOVA_APIGW --config-file $TRIO2O_NOVA_APIGW_CONF"
+        run_process t-ngw "$TRIO2O_BIN_DIR/trio2o-nova-apigw --config-file $TRIO2O_NOVA_APIGW_CONF"
 
         reconfigure_nova
 
@@ -306,7 +314,7 @@ elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
 
         create_cinder_apigw_accounts
 
-        run_process t-cgw "python $TRIO2O_CINDER_APIGW --config-file $TRIO2O_CINDER_APIGW_CONF"
+        run_process t-cgw "$TRIO2O_BIN_DIR/trio2o-cinder-apigw --config-file $TRIO2O_CINDER_APIGW_CONF"
 
         get_or_create_endpoint "volumev2" \
             "$POD_REGION_NAME" \
@@ -317,7 +325,7 @@ elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
 
     if is_service_enabled t-job; then
 
-        run_process t-job "python $TRIO2O_XJOB --config-file $TRIO2O_XJOB_CONF"
+        run_process t-job "$TRIO2O_BIN_DIR/trio2o-xjob --config-file $TRIO2O_XJOB_CONF"
     fi
 fi
 
@@ -339,3 +347,4 @@ if [[ "$1" == "unstack" ]]; then
        stop_process t-job
     fi
 fi
+
