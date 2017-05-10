@@ -35,10 +35,10 @@ from trio2o.db import models
 
 client_opts = [
     cfg.StrOpt('auth_url',
-               default='http://127.0.0.1:5000/v3',
+               default='http://127.0.0.1/identity',
                help='keystone authorization url'),
     cfg.StrOpt('identity_url',
-               default='http://127.0.0.1:35357/v3',
+               default='http://127.0.0.1/identity/v3',
                help='keystone service url'),
     cfg.BoolOpt('auto_refresh_endpoint',
                 default=False,
@@ -229,6 +229,8 @@ class Client(object):
 
     def _get_config_with_retry(self, cxt, filters, pod, service, retry):
         conf_list = api.list_pod_service_configurations(cxt, filters)
+        if len(conf_list) > 1:
+            raise exceptions.EndpointNotUnique(pod, service)
         if len(conf_list) == 0:
             if not retry:
                 raise exceptions.EndpointNotFound(pod, service)
@@ -293,7 +295,7 @@ class Client(object):
                     cxt, config_filters)
 
                 if len(config_list) > 1:
-                    continue
+                    raise exceptions.EndpointNotUnique(pod_id, service)
                 if len(config_list) == 1:
                     config_id = config_list[0]['service_id']
                     update_dict = {
