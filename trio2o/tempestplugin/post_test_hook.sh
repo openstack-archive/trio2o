@@ -70,10 +70,10 @@ source $DEVSTACK_DIR/functions
 iniset $TEMPEST_CONF auth admin_username ${ADMIN_USERNAME:-"admin"}
 iniset $TEMPEST_CONF auth admin_project_name admin
 iniset $TEMPEST_CONF auth admin_password $OS_PASSWORD
-iniset $TEMPEST_CONF identity auth_version v2
+iniset $TEMPEST_CONF identity auth_version v3
 iniset $TEMPEST_CONF identity uri_v3 http://$SERVICE_HOST/identity/v3
-iniset $TEMPEST_CONF identity uri http://$SERVICE_HOST:5000/v2.0/
-iniset $TEMPEST_CONF identity-feature-enabled api_v2 True
+iniset $TEMPEST_CONF identity uri $OS_AUTH_URL
+iniset $TEMPEST_CONF identity-feature-enabled api_v3 True
 
 iniset $TEMPEST_CONF compute region RegionOne
 iniset $TEMPEST_CONF compute image_ref $image_id
