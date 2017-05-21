@@ -13,4 +13,4 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from trio2o.common import config as t_config  # noqa
+from oslo_config import cfg  # noqa
