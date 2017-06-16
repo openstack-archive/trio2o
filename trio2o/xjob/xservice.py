@@ -25,8 +25,6 @@ import oslo_messaging as messaging
 from oslo_service import service as srv
 
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
-from trio2o.common.i18n import _LI
 
 from trio2o.common import baserpc
 from trio2o.common import context
@@ -107,7 +105,7 @@ class XService(srv.Service):
 
     def start(self):
         ver_str = version.version_info
-        LOG.info(_LI('Starting %(topic)s node (version %(version)s)'),
+        LOG.info('Starting %(topic)s node (version %(version)s)',
                  {'topic': self.topic, 'version': ver_str})
 
         self.basic_config_check()
@@ -200,7 +198,7 @@ class XService(srv.Service):
         try:
             self.manager.cleanup_host()
         except Exception:
-            LOG.exception(_LE('Service error occurred during cleanup_host'))
+            LOG.exception(_('Service error occurred during cleanup_host'))
             pass
 
         super(XService, self).stop()

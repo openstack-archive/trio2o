@@ -28,7 +28,6 @@ from trio2o.common import constants as cons
 import trio2o.common.context as t_context
 from trio2o.common import httpclient as hclient
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 from trio2o.common.scheduler import filter_scheduler
 from trio2o.common import utils
 
@@ -58,13 +57,13 @@ class VolumeController(rest.RestController):
             context, az, self.tenant_id, pod_group='')
 
         if not pod:
-            LOG.error(_LE("Pod not configured or scheduling failure"))
+            LOG.error("Pod not configured or scheduling failure")
             return utils.format_cinder_error(
                 500, _('Pod not configured or scheduling failure'))
 
         t_pod = db_api.get_top_pod(context)
         if not t_pod:
-            LOG.error(_LE("Top Pod not configured"))
+            LOG.error("Top Pod not configured")
             return utils.format_cinder_error(500, _('Top Pod not configured'))
 
         # TODO(joehuang): get release from pod configuration,
@@ -81,8 +80,7 @@ class VolumeController(rest.RestController):
             s_type=cons.ST_CINDER)
 
         if s_ctx['b_url'] == '':
-            LOG.error(_LE("Bottom Pod endpoint incorrect %s") %
-                      pod['pod_name'])
+            LOG.error("Bottom Pod endpoint incorrect %s", pod['pod_name'])
             return utils.format_cinder_error(
                 500, _('Bottom Pod endpoint incorrect'))
 
@@ -130,12 +128,12 @@ class VolumeController(rest.RestController):
                              'project_id': self.tenant_id,
                              'resource_type': cons.RT_VOLUME})
                 except Exception as e:
-                    LOG.exception(_LE('Failed to create volume '
-                                      'resource routing'
-                                      'top_id: %(top_id)s ,'
-                                      'bottom_id: %(bottom_id)s ,'
-                                      'pod_id: %(pod_id)s ,'
-                                      '%(exception)s '),
+                    LOG.exception(_('Failed to create volume '
+                                    'resource routing'
+                                    'top_id: %(top_id)s ,'
+                                    'bottom_id: %(bottom_id)s ,'
+                                    'pod_id: %(pod_id)s ,'
+                                    '%(exception)s '),
                                   {'top_id': b_vol_ret['id'],
                                    'bottom_id': b_vol_ret['id'],
                                    'pod_id': pod['pod_id'],
@@ -248,8 +246,7 @@ class VolumeController(rest.RestController):
                 pod['pod_name'],
                 s_type=cons.ST_CINDER)
             if s_ctx['b_url'] == '':
-                LOG.error(_LE("bottom pod endpoint incorrect %s")
-                          % pod['pod_name'])
+                LOG.error("bottom pod endpoint incorrect %s", pod['pod_name'])
                 continue
 
             # TODO(joehuang): get the release of top and bottom

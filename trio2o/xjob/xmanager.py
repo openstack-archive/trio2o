@@ -26,9 +26,6 @@ from oslo_service import periodic_task
 from trio2o.common import client
 from trio2o.common import constants
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
-from trio2o.common.i18n import _LI
-from trio2o.common.i18n import _LW
 from trio2o.common import xrpcapi
 import trio2o.db.api as db_api
 
@@ -91,9 +88,9 @@ def _job_handle(job_type):
                         # fail and try again to obtain the lock
                         db_api.finish_job(ctx, running_job['id'], False,
                                           time_new)
-                        LOG.warning(_LW('Job %(job)s of type %(job_type)s for '
-                                        'resource %(resource)s expires, set '
-                                        'its state to Fail'),
+                        LOG.warning('Job %(job)s of type %(job_type)s for '
+                                    'resource %(resource)s expires, set '
+                                    'its state to Fail',
                                     {'job': running_job['id'],
                                      'job_type': job_type,
                                      'resource': resource_id})
@@ -108,8 +105,8 @@ def _job_handle(job_type):
                     func(*args, **kwargs)
                 except Exception:
                     db_api.finish_job(ctx, job['id'], False, time_new)
-                    LOG.error(_LE('Job %(job)s of type %(job_type)s for '
-                                  'resource %(resource)s fails'),
+                    LOG.error('Job %(job)s of type %(job_type)s for '
+                              'resource %(resource)s fails',
                               {'job': job['id'],
                                'job_type': job_type,
                                'resource': resource_id})
@@ -213,7 +210,7 @@ class XManager(PeriodicTasks):
     # rpc message endpoint handling
     def test_rpc(self, ctx, payload):
 
-        LOG.info(_LI("xmanager receive payload: %s"), payload)
+        LOG.info("xmanager receive payload: %s", payload)
 
         info_text = "xmanager receive payload: %s" % payload
 

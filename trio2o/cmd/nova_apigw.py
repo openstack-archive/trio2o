@@ -29,8 +29,6 @@ from oslo_log import log as logging
 from oslo_service import wsgi
 
 from trio2o.common import config
-from trio2o.common.i18n import _LI
-from trio2o.common.i18n import _LW
 from trio2o.common import restapp
 
 from trio2o.nova_apigw import app
@@ -48,17 +46,17 @@ def main():
     workers = CONF.api_workers
 
     if workers < 1:
-        LOG.warning(_LW("Wrong worker number, worker = %(workers)s"), workers)
+        LOG.warning("Wrong worker number, worker = %(workers)s", workers)
         workers = 1
 
-    LOG.info(_LI("Nova_APIGW on http://%(host)s:%(port)s with %(workers)s"),
+    LOG.info("Nova_APIGW on http://%(host)s:%(port)s with %(workers)s",
              {'host': host, 'port': port, 'workers': workers})
 
     service = wsgi.Server(CONF, 'Trio2o Nova_APIGW',
                           application, host, port)
     restapp.serve(service, CONF, workers)
 
-    LOG.info(_LI("Configuration:"))
+    LOG.info("Configuration:")
     CONF.log_opt_values(LOG, std_logging.INFO)
 
     restapp.wait()
