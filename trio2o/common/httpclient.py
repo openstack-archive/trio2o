@@ -23,7 +23,6 @@ from oslo_log import log as logging
 
 from trio2o.common import client
 from trio2o.common import constants as cons
-from trio2o.common.i18n import _LE
 from trio2o.common import utils
 from trio2o.db import api as db_api
 
@@ -175,8 +174,7 @@ def get_res_routing_ref(context, _id, t_url, s_type):
                                 s_type=s_type)
 
     if s_ctx['b_url'] == '':
-        LOG.error(_LE("bottom pod endpoint incorrect %s") %
-                  pod_name)
+        LOG.error("bottom pod endpoint incorrect %s", pod_name)
 
     return s_ctx
 

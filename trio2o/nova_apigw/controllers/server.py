@@ -25,7 +25,6 @@ from trio2o.common import constants
 import trio2o.common.context as t_context
 import trio2o.common.exceptions as t_exceptions
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 import trio2o.common.lock_handle as t_lock
 from trio2o.common.quota import QUOTAS
 from trio2o.common.scheduler import filter_scheduler
@@ -247,8 +246,7 @@ class ServerController(rest.RestController):
                 t_exceptions.OnsetFilePathLimitExceeded,
                 t_exceptions.OnsetFileContentLimitExceeded) as e:
             msg = str(e)
-            LOG.exception(_LE('Quota exceeded %(msg)s'),
-                          {'msg': msg})
+            LOG.exception('Quota exceeded %(msg)s', {'msg': msg})
             return utils.format_nova_error(400, _('Quota exceeded %s') % msg)
 
     def _check_injected_file_quota(self, context, injected_files):
@@ -294,15 +292,15 @@ class ServerController(rest.RestController):
             metadata = t_server_dict.get('metadata', None)
             self._check_metadata_properties_quota(ctx, metadata)
         except t_exceptions.InvalidMetadata as e1:
-            LOG.exception(_LE('Invalid metadata %(exception)s'),
+            LOG.exception('Invalid metadata %(exception)s',
                           {'exception': str(e1)})
             return utils.format_nova_error(400, _('Invalid metadata'))
         except t_exceptions.InvalidMetadataSize as e2:
-            LOG.exception(_LE('Invalid metadata size %(exception)s'),
+            LOG.exception('Invalid metadata size %(exception)s',
                           {'exception': str(e2)})
             return utils.format_nova_error(400, _('Invalid metadata size'))
         except t_exceptions.MetadataLimitExceeded as e3:
-            LOG.exception(_LE('Quota exceeded %(exception)s'),
+            LOG.exception('Quota exceeded %(exception)s',
                           {'exception': str(e3)})
             return utils.format_nova_error(400,
                                            _('Quota exceeded in metadata'))

@@ -23,7 +23,6 @@ from oslo_utils import uuidutils
 import trio2o.common.context as t_context
 from trio2o.common import exceptions
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 from trio2o.common import utils
 import trio2o.db.api as db_api
 from trio2o.db import core
@@ -126,8 +125,8 @@ class VolumeTypeController(rest.RestController):
                                        "project_id": project})
                     access_ref.save(session=session)
             except Exception as e:
-                LOG.exception(_LE('Fail to create volume type: %(name)s,'
-                                  '%(exception)s'),
+                LOG.exception('Fail to create volume type: %(name)s,'
+                              '%(exception)s',
                               {'name': vol_type['name'],
                                'exception': e})
                 return utils.format_cinder_error(
@@ -149,10 +148,8 @@ class VolumeTypeController(rest.RestController):
         except exceptions.VolumeTypeNotFound as e:
             return utils.format_cinder_error(404, e.message)
         except Exception as e:
-            LOG.exception(_LE('Volume type not found: %(id)s,'
-                              '%(exception)s'),
-                          {'id': _id,
-                           'exception': e})
+            LOG.exception('Volume type not found: %(id)s, %(exception)s',
+                          {'id': _id, 'exception': e})
             return utils.format_cinder_error(
                 404, _("Volume type %(id)s could not be found.") % {
                     'id': _id})
@@ -171,7 +168,7 @@ class VolumeTypeController(rest.RestController):
                                                      list_result=True,
                                                      filters=filters)
         except Exception as e:
-            LOG.exception(_LE('Fail to retrieve volume types: %(exception)s'),
+            LOG.exception('Fail to retrieve volume types: %(exception)s',
                           {'exception': e})
             return utils.format_cinder_error(500, e)
 
@@ -245,8 +242,8 @@ class VolumeTypeController(rest.RestController):
         except exceptions.VolumeTypeUpdateFailed as e:
             return utils.format_cinder_error(500, e.message)
         except Exception as e:
-            LOG.exception(_LE('Fail to update volume type: %(name)s,'
-                              '%(exception)s'),
+            LOG.exception('Fail to update volume type: %(name)s,'
+                          '%(exception)s',
                           {'name': values['name'],
                            'exception': e})
             return utils.format_cinder_error(
@@ -275,8 +272,8 @@ class VolumeTypeController(rest.RestController):
             try:
                 db_api.volume_type_delete(context, _id, session)
             except Exception as e:
-                LOG.exception(_LE('Fail to update volume type: %(id)s,'
-                                  '%(exception)s'),
+                LOG.exception('Fail to update volume type: %(id)s,'
+                              '%(exception)s',
                               {'id': _id,
                                'exception': e})
                 return utils.format_cinder_error(

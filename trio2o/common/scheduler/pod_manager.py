@@ -13,7 +13,6 @@
 from oslo_log import log as logging
 from stevedore import driver
 
-from trio2o.common.i18n import _LE
 from trio2o.db import api as db_api
 
 LOG = logging.getLogger(__name__)
@@ -79,7 +78,7 @@ class PodManager(object):
         try:
             db_api.create_pod_binding(context, tenant_id, pod_id)
         except Exception as e:
-            LOG.error(_LE('Fail to create pod binding: %(exception)s'),
+            LOG.error('Fail to create pod binding: %(exception)s',
                       {'exception': e})
             return False
         return True
@@ -91,7 +90,7 @@ class PodManager(object):
             db_api.change_pod_binding(
                 context, current_binding, pod_id)
         except Exception as e:
-            LOG.error(_LE('Fail to update pod binding: %(exception)s'),
+            LOG.error('Fail to update pod binding: %(exception)s',
                       {'exception': e})
             return False
         return True
