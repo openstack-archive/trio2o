@@ -23,7 +23,6 @@ import trio2o.common.client as t_client
 from trio2o.common import constants
 import trio2o.common.context as t_context
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 from trio2o.common import utils
 import trio2o.db.api as db_api
 
@@ -68,9 +67,9 @@ class VolumeController(rest.RestController):
         server_pod_name = server_mappings[0][0]['pod_name']
         volume_pod_name = volume_mappings[0][0]['pod_name']
         if server_pod_name != volume_pod_name:
-            LOG.error(_LE('Server %(server)s is in pod %(server_pod)s and '
+            LOG.error('Server %(server)s is in pod %(server_pod)s and '
                           'volume %(volume)s is in pod %(volume_pod)s, which '
-                          'are not the same.'),
+                          'are not the same.",
                       {'server': self.server_id,
                        'server_pod': server_pod_name,
                        'volume': body['volumeId'],
