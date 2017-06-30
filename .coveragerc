@@ -1,7 +1,7 @@
 [run]
 branch = True
 source = trio2o
-omit = trio2o/tests/*, trio2o/tempestplugin/*
+omit = trio2o/tests/*
 
 [report]
 ignore_errors = True
