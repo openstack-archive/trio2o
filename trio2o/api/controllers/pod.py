@@ -26,7 +26,6 @@ from trio2o.common import az_ag
 import trio2o.common.context as t_context
 import trio2o.common.exceptions as t_exc
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 from trio2o.common import policy
 from trio2o.common import utils
 
@@ -106,17 +105,17 @@ class PodsController(rest.RestController):
                      'dc_name': dc_name,
                      'az_name': az_name})
         except db_exc.DBDuplicateEntry as e1:
-            LOG.exception(_LE('Record already exists on %(pod_name)s: '
-                              '%(exception)s'),
+            LOG.exception('Record already exists on %(pod_name)s: '
+                          '%(exception)s',
                           {'pod_name': pod_name,
-                          'exception': e1})
+                           'exception': e1})
             return Response(_('Record already exists'), 409)
         except Exception as e2:
-            LOG.exception(_LE('Failed to create pod: %(pod_name)s,'
-                              'pod_az_name: %(pod_az_name)s,'
-                              'dc_name: %(dc_name)s,'
-                              'az_name: %(az_name)s'
-                              '%(exception)s '),
+            LOG.exception('Failed to create pod: %(pod_name)s,'
+                          'pod_az_name: %(pod_az_name)s,'
+                          'dc_name: %(dc_name)s,'
+                          'az_name: %(az_name)s'
+                          '%(exception)s ',
                           {'pod_name': pod_name,
                            'pod_az_name': pod_az_name,
                            'dc_name': dc_name,
@@ -151,7 +150,7 @@ class PodsController(rest.RestController):
         try:
             return {'pods': db_api.list_pods(context)}
         except Exception as e:
-            LOG.exception(_LE('Failed to list all pods: %(exception)s '),
+            LOG.exception('Failed to list all pods: %(exception)s ',
                           {'exception': e})
 
             pecan.abort(500, _('Failed to list pods'))
@@ -178,8 +177,8 @@ class PodsController(rest.RestController):
         except t_exc.ResourceNotFound:
             return Response(_('Pod not found'), 404)
         except Exception as e:
-            LOG.exception(_LE('Failed to delete pod: %(pod_id)s,'
-                              '%(exception)s'),
+            LOG.exception('Failed to delete pod: %(pod_id)s,'
+                          '%(exception)s',
                           {'pod_id': _id,
                            'exception': e})
 
@@ -195,7 +194,7 @@ class PodsController(rest.RestController):
                     if pod['az_name'] == '' and pod['pod_name'] != '':
                         return pod['pod_name']
         except Exception as e:
-            LOG.exception(_LE('Failed to get top region: %(exception)s '),
+            LOG.exception('Failed to get top region: %(exception)s ',
                           {'exception': e})
 
             return top_region_name
@@ -239,11 +238,11 @@ class BindingsController(rest.RestController):
         except t_exc.ResourceNotFound:
             return Response(_('pod_id not found in pod'), 422)
         except Exception as e:
-            LOG.exception(_LE('Failed to get_resource for pod_id: '
-                              '%(pod_id)s ,'
-                              '%(exception)s '),
+            LOG.exception('Failed to get_resource for pod_id: '
+                          '%(pod_id)s ,'
+                          '%(exception)s ',
                           {'pod_id': pod_id,
-                          'exception': e})
+                           'exception': e})
             pecan.abort(500, _('Failed to create pod binding'))
             return
 
@@ -256,7 +255,7 @@ class BindingsController(rest.RestController):
         except db_exc.DBReferenceError:
             return Response(_('DB reference not exists in pod'), 422)
         except Exception as e:
-            LOG.exception(_LE('Failed to create pod binding: %(exception)s '),
+            LOG.exception('Failed to create pod binding: %(exception)s ',
                           {'exception': e})
             pecan.abort(500, _('Failed to create pod binding'))
             return

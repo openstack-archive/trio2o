@@ -26,7 +26,6 @@ from trio2o.common import constants as cons
 import trio2o.common.context as t_context
 from trio2o.common import httpclient as hclient
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 from trio2o.common import utils
 import trio2o.db.api as db_api
 
@@ -63,13 +62,13 @@ class VolumeMetaDataController(rest.RestController):
 
             t_pod = db_api.get_top_pod(context)
             if not t_pod:
-                LOG.error(_LE("Top Pod not configured"))
+                LOG.error("Top Pod not configured")
                 return utils.format_cinder_error(
                     500, _('Top Pod not configured'))
         except Exception as e:
-            LOG.exception(_LE('Fail to create metadata for a volume:'
-                              '%(volume_id)s'
-                              '%(exception)s'),
+            LOG.exception('Fail to create metadata for a volume:'
+                          '%(volume_id)s'
+                          '%(exception)s',
                           {'volume_id': self.volume_id,
                            'exception': e})
             return utils.format_cinder_error(500, _('Fail to create metadata'))
@@ -84,8 +83,7 @@ class VolumeMetaDataController(rest.RestController):
             s_type=cons.ST_CINDER)
 
         if s_ctx['b_url'] == '':
-            LOG.error(_LE("Bottom pod endpoint incorrect %s") %
-                      pod['pod_name'])
+            LOG.error("Bottom pod endpoint incorrect %s", pod['pod_name'])
             return utils.format_cinder_error(
                 500, _('Bottom pod endpoint incorrect'))
 
@@ -144,9 +142,9 @@ class VolumeMetaDataController(rest.RestController):
                 return utils.format_cinder_error(
                     500, _('Fail to find resource'))
         except Exception as e:
-            LOG.exception(_LE('Fail to get metadata for a volume:'
-                              '%(volume_id)s'
-                              '%(exception)s'),
+            LOG.exception('Fail to get metadata for a volume:'
+                          '%(volume_id)s'
+                          '%(exception)s',
                           {'volume_id': self.volume_id,
                            'exception': e})
             return utils.format_cinder_error(500, _('Fail to get metadata'))
@@ -199,9 +197,9 @@ class VolumeMetaDataController(rest.RestController):
                 return utils.format_cinder_error(
                     404, _('Resource not found'))
         except Exception as e:
-            LOG.exception(_LE('Fail to update metadata for a volume: '
-                              '%(volume_id)s'
-                              '%(exception)s'),
+            LOG.exception('Fail to update metadata for a volume: '
+                          '%(volume_id)s'
+                          '%(exception)s',
                           {'volume_id': self.volume_id,
                            'exception': e})
             return utils.format_cinder_error(
@@ -258,9 +256,9 @@ class VolumeMetaDataController(rest.RestController):
                 return utils.format_cinder_error(
                     404, _('Fail to find resource'))
         except Exception as e:
-            LOG.exception(_LE('Fail to delete metadata from a volume: '
-                              '%(volume_id)s'
-                              '%(exception)s'),
+            LOG.exception('Fail to delete metadata from a volume: '
+                          '%(volume_id)s'
+                          '%(exception)s',
                           {'volume_id': self.volume_id,
                            'exception': e})
             return utils.format_cinder_error(
