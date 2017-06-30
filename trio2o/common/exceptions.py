@@ -21,7 +21,6 @@ import six
 
 from oslo_log import log as logging
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 
 LOG = logging.getLogger(__name__)
 
@@ -88,8 +87,8 @@ class Trio2oException(Exception):
     def _should_format(self):
 
         if self.kwargs['message'] is None and '%(message)' in self.message:
-            LOG.error(_LE('\%(message)s in message '
-                          'but init parameter is None'))
+            LOG.error('\%(message)s in message '
+                      'but init parameter is None')
 
         return self.kwargs['message'] is None or '%(message)' in self.message
 

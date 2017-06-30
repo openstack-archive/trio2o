@@ -31,7 +31,6 @@ from trio2o.common import constants
 from trio2o.common.context import is_admin_context as _is_admin_context
 from trio2o.common import exceptions
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LW
 
 from trio2o.db import core
 from trio2o.db import models
@@ -403,8 +402,8 @@ def _retry_on_deadlock(f):
             try:
                 return f(*args, **kwargs)
             except db_exc.DBDeadlock:
-                LOG.warning(_LW("Deadlock detected when running "
-                                "'%(func_name)s': Retrying..."),
+                LOG.warning("Deadlock detected when running "
+                            "'%(func_name)s': Retrying...",
                             dict(func_name=f.__name__))
                 # Retry!
                 time.sleep(0.5)
@@ -827,8 +826,8 @@ def quota_reserve(context, resources, quotas, deltas, expire,
                     usages[resource].reserved += delta
 
     if unders:
-        LOG.warning(_LW("Change will make usage less than 0 for the following "
-                        "resources: %s"), unders)
+        LOG.warning("Change will make usage less than 0 for the following "
+                    "resources: %s", unders)
     if overs:
         usages = {k: dict(in_use=v['in_use'], reserved=v['reserved'])
                   for k, v in usages.items()}

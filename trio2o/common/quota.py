@@ -32,7 +32,6 @@ from trio2o.common import client
 from trio2o.common import constants as cons
 from trio2o.common import exceptions as t_exceptions
 from trio2o.common.i18n import _
-from trio2o.common.i18n import _LE
 from trio2o.common import utils
 from trio2o.db import api as db_api
 
@@ -906,8 +905,8 @@ class QuotaEngine(object):
             # logged, however, because this is less than optimal.
 
             msg = str(e)
-            LOG.exception(_LE("Failed to commit reservations"
-                              " %(reservations)s, exception %(msg)s"),
+            LOG.exception("Failed to commit reservations"
+                          " %(reservations)s, exception %(msg)s",
                           {'reservations': reservations, 'msg': msg})
 
     def rollback(self, context, reservations, project_id=None):
@@ -929,8 +928,8 @@ class QuotaEngine(object):
             # mechanisms will resolve the issue.  The exception is
             # logged, however, because this is less than optimal.
             msg = str(e)
-            LOG.exception(_LE("Failed to roll back reservations"
-                              " %(reservations)s, exception %(msg)s"),
+            LOG.exception("Failed to roll back reservations"
+                          " %(reservations)s, exception %(msg)s",
                           {'reservations': reservations, 'msg': msg})
 
     def destroy_by_project(self, context, project_id):
