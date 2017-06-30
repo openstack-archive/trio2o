@@ -16,8 +16,6 @@
 from oslo_log import log as logging
 from oslo_utils import uuidutils
 
-from trio2o.common.i18n import _LE
-
 from trio2o.db import api as db_api
 from trio2o.db import core
 from trio2o.db import models
@@ -151,7 +149,7 @@ def get_pod_by_az_tenant(context, az_name, tenant_id):
                          'is_binding': True})
                     return pod, pod['pod_az_name']
             except Exception as e:
-                LOG.error(_LE('Fail to create pod binding: %(exception)s'),
+                LOG.error('Fail to create pod binding: %(exception)s',
                           {'exception': e})
                 return None, None
 
