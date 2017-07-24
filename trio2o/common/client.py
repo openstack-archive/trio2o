@@ -17,7 +17,6 @@ import collections
 import functools
 import inspect
 import six
-import uuid
 
 from keystoneclient.auth.identity import v3 as auth_identity
 from keystoneclient.auth import token_endpoint
@@ -25,6 +24,7 @@ from keystoneclient import session
 from keystoneclient.v3 import client as keystone_client
 from oslo_config import cfg
 from oslo_log import log as logging
+from oslo_utils import uuidutils
 
 import trio2o.common.context as trio2o_context
 from trio2o.common import exceptions
@@ -304,7 +304,7 @@ class Client(object):
                         cxt, config_id, update_dict)
                 else:
                     config_dict = {
-                        'service_id': str(uuid.uuid4()),
+                        'service_id': uuidutils.generate_uuid(),
                         'pod_id': pod_id,
                         'service_type': service,
                         'service_url': endpoint_map[region][service]
