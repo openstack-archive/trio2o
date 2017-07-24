@@ -17,7 +17,6 @@ import collections
 import functools
 import inspect
 import six
-import uuid
 
 from keystoneclient.auth.identity import v3 as auth_identity
 from keystoneclient.auth import token_endpoint
@@ -304,7 +303,7 @@ class Client(object):
                         cxt, config_id, update_dict)
                 else:
                     config_dict = {
-                        'service_id': str(uuid.uuid4()),
+                        'service_id': uuidutils.generate_uuid(),
                         'pod_id': pod_id,
                         'service_type': service,
                         'service_url': endpoint_map[region][service]

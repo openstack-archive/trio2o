@@ -16,7 +16,6 @@
 import functools
 import sqlalchemy as sql
 import time
-import uuid
 
 from oslo_config import cfg
 from oslo_db import exception as db_exc
@@ -804,7 +803,7 @@ def quota_reserve(context, resources, quotas, deltas, expire,
             reservations = []
             for resource, delta in deltas.items():
                 reservation = _reservation_create(elevated,
-                                                  str(uuid.uuid4()),
+                                                  uuidutils.generate_uuid(),
                                                   usages[resource],
                                                   project_id,
                                                   resource, delta, expire,
