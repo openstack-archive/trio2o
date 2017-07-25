@@ -13,7 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from tempest import test
+from tempest.lib import decorators
+
 from trio2o.tempestplugin.tests.api import base
 
 
@@ -23,7 +24,7 @@ class TestTrio2oSample(base.BaseTrio2oTest):
     def resource_setup(cls):
         super(TestTrio2oSample, cls).resource_setup()
 
-    @test.attr(type="smoke")
+    @decorators.attr(type="smoke")
     def test_sample(self):
         self.assertEqual('Trio2o Sample Test!', 'Trio2o Sample Test!')
 
