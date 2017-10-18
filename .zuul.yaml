@@ -1,0 +1,17 @@
+- job:
+    name: trio2o-devstack-functional
+    parent: legacy-dsvm-base
+    voting: false
+    required-projects:
+      - openstack-infra/devstack-gate
+      - openstack/trio2o
+    run: playbooks/legacy/trio2o-devstack-functional/run
+    post-run: playbooks/legacy/trio2o-devstack-functional/post
+    timeout: 5400
+
+- project:
+    name: openstack/trio2o
+    check:
+      jobs:
+        - trio2o-devstack-functional
+
