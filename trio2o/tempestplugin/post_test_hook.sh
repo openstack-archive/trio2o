@@ -57,8 +57,8 @@ if [ -d .testrepository ]; then
   sudo rm -r .testrepository
 fi
 
-sudo chown -R jenkins:stack $DEST/tempest
-# sudo chown -R jenkins:stack $BASE/data/tempest
+sudo chown -R $USER:stack $DEST/tempest
+# sudo chown -R $USER:stack $BASE/data/tempest
 
 # change the tempest configruation to test Trio2o
 env | grep OS_
