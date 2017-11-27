@@ -42,6 +42,18 @@ common_opts = [
                help=_("The maximum number of items returned in a single "
                       "response, value was 'infinite' or negative integer "
                       "means no limit")),
+    cfg.FloatOpt("ram_weight_multiplier",
+                 default=1.0,
+                 help="Ram weight multipler ratio"),
+    cfg.FloatOpt("disk_weight_multiplier",
+                 default=1.0,
+                 help="Disk weight multipler ratio"),
+    cfg.FloatOpt("vcpu_weight_multiplier",
+                 default=1.0,
+                 help="VCPU weight multipler ratio"),
+    cfg.FloatOpt("workload_weight_multiplier",
+                 default=1.0,
+                 help="Workload weight multipler ratio"),
 ]
 
 

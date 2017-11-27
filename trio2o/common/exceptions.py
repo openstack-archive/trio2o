@@ -303,3 +303,7 @@ class VolumeTypeExists(Duplicate):
 
 class VolumeTypeUpdateFailed(Trio2oException):
     message = _("Cannot update volume_type %(id)s")
+
+
+class ClassNotFound(NotFound):
+    msg_fmt = _("Class %(class_name)s could not be found: %(exception)s")

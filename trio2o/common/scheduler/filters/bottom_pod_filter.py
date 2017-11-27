@@ -10,13 +10,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from trio2o.common.scheduler.filters import base_filters
+from trio2o.common.scheduler import filters
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
+class BottomPodFilter(filters.BasePodFilter):
     """Returns all bottom pods."""
 
-    def is_pod_passed(self, pod, pod_group):
+    def is_pod_passed(self, context, pod, request_spec):
         flag = False
         if pod['az_name'] != '':
             flag = True
