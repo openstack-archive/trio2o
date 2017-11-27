@@ -15,6 +15,7 @@
 
 import datetime
 import six
+from six.moves import xrange
 import unittest
 
 from trio2o.common import context

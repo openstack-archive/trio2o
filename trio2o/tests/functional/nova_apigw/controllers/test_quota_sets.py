@@ -18,6 +18,7 @@ import mock
 import pecan
 from pecan.configuration import set_config
 from pecan.testing import load_test_app
+import six
 
 from oslo_config import cfg
 from oslo_config import fixture as fixture_config
@@ -48,7 +49,7 @@ def _make_body(tenant_id='foo', root=True, **kw):
 
 
 def _update_body(src_body, root=True, **kw):
-    for k, v in kw.iteritems():
+    for k, v in six.iteritems(kw):
         if root:
             src_body['quota_set'][k] = v
         else:
@@ -57,19 +58,19 @@ def _update_body(src_body, root=True, **kw):
 
 
 def _update_subproject_body(src_body, root=True, **kw):
-    for k, v in kw.iteritems():
+    for k, v in six.iteritems(kw):
         if root:
             src_body['quota_set'][k] = v
         else:
             src_body[k] = v
 
     if root:
-        for k, v in src_body['quota_set'].iteritems():
+        for k, v in six.iteritems(src_body['quota_set']):
             if not kw.get(k):
                 src_body['quota_set'][k] = 0
 
     else:
-        for k, v in src_body.iteritems():
+        for k, v in six.iteritems(src_body):
             if not kw.get(k) and k != 'id':
                 src_body[k] = 0
 
@@ -289,7 +290,7 @@ class QuotaControllerTest(test_quota.QuotaSetsOperationTest):
         def _make_default_detail_body(tenant_id='foo'):
             resources = copy.copy(self.default_quota)
 
-            for k, v in self.default_quota.iteritems():
+            for k, v in six.iteritems(self.default_quota):
                 resources[k] = {}
                 resources[k]['limit'] = v
                 resources[k]['reserved'] = 0
@@ -473,7 +474,7 @@ class QuotaControllerTest(test_quota.QuotaSetsOperationTest):
                '/os-quota-sets/' + target_tenant_id
 
     def _DictIn(self, dict_small, dict_full):
-        for k, v in dict_small.iteritems():
+        for k, v in six.iteritems(dict_small):
             if dict_full[k] != v:
                 return False
         return True

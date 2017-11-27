@@ -83,7 +83,7 @@ class ActionTest(unittest.TestCase):
         return t_server_id
 
     def _validate_error_code(self, res, code):
-        self.assertEqual(code, res[res.keys()[0]]['code'])
+        self.assertEqual(code, res[list(res.keys())[0]]['code'])
 
     @patch.object(pecan, 'response', new=FakeResponse)
     @patch.object(context, 'extract_context_from_environ')

@@ -20,12 +20,10 @@ from oslo_config import cfg
 from oslo_log import log as logging
 import oslo_messaging as messaging
 
-import rpc
-from serializer import Trio2oSerializer as Serializer
-import topics
-
 from trio2o.common import constants
-
+from trio2o.common import rpc
+from trio2o.common import serializer as Serializer
+from trio2o.common import topics
 
 CONF = cfg.CONF
 
@@ -62,7 +60,7 @@ class XJobAPI(object):
         else:
             version_cap = self.VERSION_ALIASES.get(upgrade_level,
                                                    upgrade_level)
-        serializer = Serializer()
+        serializer = Serializer.Trio2oSerializer()
         self.client = rpc.get_client(target,
                                      version_cap=version_cap,
                                      serializer=serializer)

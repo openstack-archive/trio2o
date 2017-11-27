@@ -85,7 +85,7 @@ class MicroVersion(object):
                 # or raise UnsupportedVersion exceptions.
                 api_version = api_versions.get_api_version(micro_version)
             except exceptions.UnsupportedVersion as e:
-                message = e.message
+                message = "Unsupported version"
 
         if message is None and api_version is not None:
             min_minor = int(constants.NOVA_APIGW_MIN_VERSION.split('.')[1])

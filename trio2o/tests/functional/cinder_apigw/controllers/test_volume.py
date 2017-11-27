@@ -14,7 +14,7 @@
 #    under the License.
 
 from mock import patch
-import urlparse
+from six.moves.urllib import parse as urlparse
 
 import pecan
 from pecan.configuration import set_config

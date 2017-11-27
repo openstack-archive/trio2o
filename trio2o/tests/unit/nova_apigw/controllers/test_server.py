@@ -18,6 +18,7 @@ import datetime
 import mock
 from mock import patch
 import pecan
+from six.moves import xrange
 import unittest
 
 from oslo_utils import uuidutils
@@ -315,7 +316,7 @@ class ServerTest(unittest.TestCase):
         return t_pod, b_pods
 
     def _validate_error_code(self, res, code):
-        self.assertEqual(code, res[res.keys()[0]]['code'])
+        self.assertEqual(code, res['badRequest']['code'])
 
     def test_get_or_create_route(self):
         t_pod, b_pod = self._prepare_pod()

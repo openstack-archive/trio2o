@@ -17,7 +17,7 @@ import six
 
 import pecan
 import re
-import urlparse
+from six.moves.urllib import parse as urlparse
 
 from oslo_log import log as logging
 

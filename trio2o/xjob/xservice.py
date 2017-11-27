@@ -60,7 +60,7 @@ common_opts = [
 
 service_opts = [
     cfg.IntOpt('report_interval',
-               default=10,
+               default=30,
                help='Seconds between nodes reporting state to datastore'),
     cfg.BoolOpt('periodic_enable',
                 default=True,
@@ -232,7 +232,7 @@ def create_service():
         topic=topics.TOPIC_XJOB,
         manager=xmanager,
         periodic_enable=True,
-        report_interval=_TIMER_INTERVAL,
+        report_interval=None,
         periodic_interval_max=_TIMER_INTERVAL_MAX,
         serializer=Serializer()
     )

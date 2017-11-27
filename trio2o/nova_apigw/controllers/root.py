@@ -18,6 +18,7 @@ import pecan
 from pecan import expose
 from pecan import hooks
 from pecan import rest
+from pecan import Response
 
 import oslo_log.log as logging
 
