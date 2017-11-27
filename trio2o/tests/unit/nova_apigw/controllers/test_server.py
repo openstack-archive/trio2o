@@ -17,11 +17,13 @@ import copy
 import datetime
 import mock
 from mock import patch
+from oslo_config import cfg
 import pecan
 import unittest
 
 from oslo_utils import uuidutils
 
+from trio2o.api import app
 from trio2o.common import constants
 from trio2o.common import context
 import trio2o.common.exceptions as t_exceptions
@@ -32,7 +34,7 @@ from trio2o.db import api
 from trio2o.db import core
 from trio2o.db import models
 from trio2o.nova_apigw.controllers import server
-
+from trio2o.tests.unit.common.scheduler import utils
 
 TOP_NETS = []
 TOP_SUBNETS = []
@@ -290,6 +292,9 @@ class FakeClient(object):
 
 class ServerTest(unittest.TestCase):
     def setUp(self):
+        cfg.CONF.clear()
+        cfg.CONF.register_opts(app.common_opts)
+
         core.initialize()
         core.ModelBase.metadata.create_all(core.get_engine())
         self.context = context.Context()
@@ -298,19 +303,23 @@ class ServerTest(unittest.TestCase):
 
     def _prepare_pod(self, bottom_pod_num=1):
         t_pod = {'pod_id': 't_pod_uuid', 'pod_name': 't_region',
-                 'az_name': ''}
+                 'az_name': '', 'is_under_maintenance': False}
         api.create_pod(self.context, t_pod)
         if bottom_pod_num == 1:
             b_pod = {'pod_id': 'b_pod_uuid', 'pod_name': 'b_region',
-                     'az_name': 'b_az'}
+                     'az_name': 'b_az', 'is_under_maintenance': False}
             api.create_pod(self.context, b_pod)
+            utils.create_pod_state_for_pod(self.context, b_pod['pod_id'])
             return t_pod, b_pod
         b_pods = []
         for i in xrange(1, bottom_pod_num + 1):
             b_pod = {'pod_id': 'b_pod_%d_uuid' % i,
                      'pod_name': 'b_region_%d' % i,
-                     'az_name': 'b_az_%d' % i}
+                     'az_name': 'b_az_%d' % i,
+                     'is_under_maintenance': False,
+                     }
             api.create_pod(self.context, b_pod)
+            utils.create_pod_state_for_pod(self.context, b_pod['pod_id'], i+1)
             b_pods.append(b_pod)
         return t_pod, b_pods
 
@@ -377,6 +386,7 @@ class ServerTest(unittest.TestCase):
     @patch.object(context, 'extract_context_from_environ')
     def test_post(self, mock_ctx, mock_create):
         t_pod, b_pod = self._prepare_pod()
+
         top_net_id = 'top_net_id'
         top_subnet_id = 'top_subnet_id'
         top_sg_id = 'top_sg_id'
@@ -823,6 +833,7 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(flavor_id, ret_server['flavor'])
 
     def tearDown(self):
+        cfg.CONF.unregister_opts(app.common_opts)
         core.ModelBase.metadata.drop_all(core.get_engine())
         for res in RES_LIST:
             del res[:]
