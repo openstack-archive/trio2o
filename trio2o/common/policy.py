@@ -57,6 +57,11 @@ ADMIN_API_BINDINGS_DELETE = 'admin_api:bindings:delete'
 ADMIN_API_BINDINGS_SHOW = 'admin_api:bindings:show'
 ADMIN_API_BINDINGS_LIST = 'admin_api:bindings:list'
 
+ADMIN_API_AFFINITY_TAG_CREATE = 'admin_api:affinity_tag:create'
+ADMIN_API_AFFINITY_TAG_DELETE = 'admin_api:affinity_tag:delete'
+ADMIN_API_AFFINITY_TAG_SHOW = 'admin_api:affinity_tag:show'
+ADMIN_API_AFFINITY_TAG_LIST = 'admin_api:affinity_tag:list'
+
 trio2o_admin_api_policies = [
     policy.RuleDefault(ADMIN_API_PODS_CREATE,
                        'rule:admin_api',
@@ -83,6 +88,19 @@ trio2o_admin_api_policies = [
     policy.RuleDefault(ADMIN_API_BINDINGS_LIST,
                        'rule:admin_api',
                        description='List pod bindings'),
+
+    policy.RuleDefault(ADMIN_API_AFFINITY_TAG_CREATE,
+                       'rule:admin_api',
+                       description='Create pod affinity tag'),
+    policy.RuleDefault(ADMIN_API_AFFINITY_TAG_DELETE,
+                       'rule:admin_api',
+                       description='Delete pod affinity tag'),
+    policy.RuleDefault(ADMIN_API_AFFINITY_TAG_SHOW,
+                       'rule:admin_api',
+                       description='Show pod affinity tag'),
+    policy.RuleDefault(ADMIN_API_AFFINITY_TAG_LIST,
+                       'rule:admin_api',
+                       description='List pod affinity tag'),
 ]
 
 

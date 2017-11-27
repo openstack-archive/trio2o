@@ -117,7 +117,8 @@ class ModelsTest(unittest.TestCase):
                'pod_name': 'test_pod',
                'pod_az_name': 'test_pod_az_name',
                'dc_name': 'test_dc_name',
-               'az_name': 'test_az_uuid'}
+               'az_name': 'test_az_uuid',
+               'is_under_maintenance': False}
         pod_obj = models.Pod.from_dict(pod)
         for attr in pod_obj.attributes:
             self.assertEqual(getattr(pod_obj, attr), pod[attr])
@@ -127,7 +128,8 @@ class ModelsTest(unittest.TestCase):
                'pod_name': 'test_pod',
                'pod_az_name': 'test_pod_az_name',
                'dc_name': 'test_dc_name',
-               'az_name': 'test_az_uuid'}
+               'az_name': 'test_az_uuid',
+               'is_under_maintenance': False}
         pod_ret = api.create_pod(self.context, pod)
         self.assertEqual(pod_ret, pod)
 
@@ -144,7 +146,9 @@ class ModelsTest(unittest.TestCase):
     def test_update(self):
         pod = {'pod_id': 'test_pod_uuid',
                'pod_name': 'test_pod',
-               'az_name': 'test_az1_uuid'}
+               'az_name': 'test_az1_uuid',
+               'is_under_maintenance': False
+               }
         api.create_pod(self.context, pod)
         update_dict = {'pod_id': 'fake_uuid',
                        'pod_name': 'test_pod2',
@@ -158,7 +162,9 @@ class ModelsTest(unittest.TestCase):
     def test_delete(self):
         pod = {'pod_id': 'test_pod_uuid',
                'pod_name': 'test_pod',
-               'az_name': 'test_az_uuid'}
+               'az_name': 'test_az_uuid',
+               'is_under_maintenance': False
+               }
         api.create_pod(self.context, pod)
         api.delete_pod(self.context, 'test_pod_uuid')
         self.assertRaises(exceptions.ResourceNotFound, api.get_pod,
@@ -169,12 +175,16 @@ class ModelsTest(unittest.TestCase):
                 'pod_name': 'test_pod1',
                 'pod_az_name': 'test_pod_az_name1',
                 'dc_name': 'test_dc_name1',
-                'az_name': 'test_az1_uuid'}
+                'az_name': 'test_az1_uuid',
+                'is_under_maintenance': False
+                }
         pod2 = {'pod_id': 'test_pod2_uuid',
                 'pod_name': 'test_pod2',
                 'pod_az_name': 'test_pod_az_name2',
                 'dc_name': 'test_dc_name1',
-                'az_name': 'test_az2_uuid'}
+                'az_name': 'test_az2_uuid',
+                'is_under_maintenance': False
+                }
         api.create_pod(self.context, pod1)
         api.create_pod(self.context, pod2)
         filters = [{'key': 'pod_name',
@@ -194,17 +204,23 @@ class ModelsTest(unittest.TestCase):
                 'pod_name': 'test_pod1',
                 'pod_az_name': 'test_pod_az_name1',
                 'dc_name': 'test_dc_name1',
-                'az_name': 'test_az1_uuid'}
+                'az_name': 'test_az1_uuid',
+                'is_under_maintenance': False
+                }
         pod2 = {'pod_id': 'test_pod2_uuid',
                 'pod_name': 'test_pod2',
                 'pod_az_name': 'test_pod_az_name2',
                 'dc_name': 'test_dc_name1',
-                'az_name': 'test_az2_uuid'}
+                'az_name': 'test_az2_uuid',
+                'is_under_maintenance': False
+                }
         pod3 = {'pod_id': 'test_pod3_uuid',
                 'pod_name': 'test_pod3',
                 'pod_az_name': 'test_pod_az_name3',
                 'dc_name': 'test_dc_name1',
-                'az_name': 'test_az3_uuid'}
+                'az_name': 'test_az3_uuid',
+                'is_under_maintenance': False
+                }
         pods = [pod1, pod2, pod3]
         for pod in pods:
             api.create_pod(self.context, pod)
@@ -232,7 +248,8 @@ class ModelsTest(unittest.TestCase):
     def test_resource_routing_unique_key(self):
         pod = {'pod_id': 'test_pod1_uuid',
                'pod_name': 'test_pod1',
-               'az_name': 'test_az1_uuid'}
+               'az_name': 'test_az1_uuid',
+               'is_under_maintenance': False}
         api.create_pod(self.context, pod)
         routing = {'top_id': 'top_uuid',
                    'pod_id': 'test_pod1_uuid',

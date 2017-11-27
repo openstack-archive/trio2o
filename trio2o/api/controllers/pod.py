@@ -61,6 +61,7 @@ class PodsController(rest.RestController):
         pod_az_name = pod.get('pod_az_name', '').strip()
         dc_name = pod.get('dc_name', '').strip()
         az_name = pod.get('az_name', '').strip()
+        is_under_maintenance = pod.get('is_under_maintenance', False)
         _uuid = uuidutils.generate_uuid()
 
         if az_name == '' and pod_name == '':
@@ -104,7 +105,8 @@ class PodsController(rest.RestController):
                      'pod_name': pod_name,
                      'pod_az_name': pod_az_name,
                      'dc_name': dc_name,
-                     'az_name': az_name})
+                     'az_name': az_name,
+                     'is_under_maintenance': is_under_maintenance})
         except db_exc.DBDuplicateEntry as e1:
             LOG.exception(_LE('Record already exists on %(pod_name)s: '
                               '%(exception)s'),

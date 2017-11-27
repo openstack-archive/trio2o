@@ -22,6 +22,7 @@ from oslo_config import cfg
 from oslo_log import log as logging
 import oslo_messaging as messaging
 from oslo_service import periodic_task
+from oslo_utils import uuidutils
 
 from trio2o.common import client
 from trio2o.common import constants
@@ -242,3 +243,49 @@ class XManager(PeriodicTasks):
                   {'resource_id': failed_job['resource_id'],
                    'job_type': job_type})
         self.job_handles[job_type](ctx, payload=payload)
+
+    @periodic_task.periodic_task
+    def pod_state_statistics(self, context):
+        """Resource statistics in one OpenStack instance(pod)
+
+        Pull pod usage information from cascaded pod by nova client.
+        According to this information we will update the pod state
+        in our own db. Summary statistics for all enabled hypervisors
+        over all compute nodes in one pod is called a single pod state.
+        This should be a periodic task, so later if we want to use all
+        pods usage statistics, we directly access the db and read data
+        from pod state table.
+
+        :param context: wsgi request object
+        :return: return nothing, update the pod state in db is enough
+        """
+
+        if not context.is_admin:
+            context.elevated()
+
+        pods = db_api.list_pods(context)
+        for pod in pods:
+            if not pod['az_name']:
+                continue
+            client = self._get_client(pod['pod_name'])
+            hypervisor_stat = client.list_hypervisor_stats(context)
+
+            pod_state_filter = [{'key': 'pod_id',
+                                 'comparator': 'eq',
+                                 'value': pod['id']}]
+            pod_states = db_api.list_pod_states(context, pod_state_filter)
+            if len(pod_states) == 0:
+                # the pod state record doesn't exist in db, then insert it
+                hypervisor_stat['pod_id'] = pod['id']
+                hypervisor_stat['id'] = uuidutils.generate_uuid()
+                db_api.create_pod_state(context, hypervisor_stat)
+            elif len(pod_states) == 1:
+                # the pod state record already exists, we should update it
+                db_api.update_pod_state(context, pod_states[0]['id'],
+                                        hypervisor_stat)
+            else:
+                # the same pod usage info was collected more than once: this
+                # shouldn't happen
+                LOG.exception(
+                    _LE("Error: duplicate pod %(pod_id)s in pod state table"),
+                    {'pod_id': pod['id']})
