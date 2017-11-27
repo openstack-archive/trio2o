@@ -47,12 +47,12 @@ class ActionTest(unittest.TestCase):
 
     def _prepare_pod(self, bottom_pod_num=1):
         t_pod = {'pod_id': 't_pod_uuid', 'pod_name': 't_region',
-                 'az_name': ''}
+                 'az_name': '', 'is_under_maintenance': 'False'}
         api.create_pod(self.context, t_pod)
         b_pods = []
         if bottom_pod_num == 1:
             b_pod = {'pod_id': 'b_pod_uuid', 'pod_name': 'b_region',
-                     'az_name': 'b_az'}
+                     'az_name': 'b_az', 'is_under_maintenance': 'False'}
             api.create_pod(self.context, b_pod)
             b_pods.append(b_pod)
         else:

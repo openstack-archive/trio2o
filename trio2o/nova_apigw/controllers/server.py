@@ -28,6 +28,7 @@ from trio2o.common.i18n import _
 from trio2o.common.i18n import _LE
 import trio2o.common.lock_handle as t_lock
 from trio2o.common.quota import QUOTAS
+from trio2o.common import request_spec
 from trio2o.common.scheduler import filter_scheduler
 from trio2o.common import utils
 from trio2o.common import xrpcapi
@@ -113,9 +114,11 @@ class ServerController(rest.RestController):
             return utils.format_nova_error(
                 400, _('server is not set'))
 
-        az = kw['server'].get('availability_zone', '')
+        az = kw['server'].get('availability_zone', None)
+        spec_obj = request_spec.RequestSpec(self.project_id,
+                                            az_name=az)
         pod, b_az = self.filter_scheduler.select_destination(
-            context, az, self.project_id, pod_group='')
+            context, spec_obj)
 
         if not pod:
             return utils.format_nova_error(
