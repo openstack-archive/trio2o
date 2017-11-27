@@ -13,11 +13,17 @@
 from trio2o.common.scheduler.filters import base_filters
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
-    """Returns all bottom pods."""
+class DestinationPodFilter(base_filters.BasePodFilter):
+    """If the pod is exactly the one user targets at, it returns True."""
 
     def is_pod_passed(self, context, pod, request_spec):
-        flag = False
-        if pod['az_name'] != '':
-            flag = True
+        flag = True
+        pod_name = pod['pod_name']
+
+        if not isinstance(request_spec, dict):
+            request_spec = request_spec.to_dict()
+        target_pod_name = request_spec['requested_destination']
+
+        if target_pod_name is not None and pod_name != target_pod_name:
+            flag = False
         return flag

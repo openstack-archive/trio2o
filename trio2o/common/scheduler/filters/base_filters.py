@@ -13,19 +13,22 @@
 
 class BaseFilter(object):
     """Base class for all pod filter classes."""
-    def _filter_one(self, obj, pod_group):
+    def _filter_one(self, context, obj, filter_properties):
         return True
 
-    def filter_all(self, filter_obj_list, pod_group):
+    def filter_all(self, context, filter_obj_list, filter_properties):
         for obj in filter_obj_list:
-            if self._filter_one(obj, pod_group):
+            if self._filter_one(context, obj, filter_properties):
                 yield obj
 
 
 class BasePodFilter(BaseFilter):
 
-    def _filter_one(self, obj, pod_group):
-        return self.is_pod_passed(obj, pod_group)
+    def _filter_one(self, context, pod, filter_properties):
+        return self.is_pod_passed(context, pod, filter_properties)
 
-    def is_pod_passed(self, pod, pod_group):
+    def is_pod_passed(self, context, pod, filter_properties):
+        """Return True if the pod passes the filter, otherwise False.
+
+        """
         raise NotImplementedError()

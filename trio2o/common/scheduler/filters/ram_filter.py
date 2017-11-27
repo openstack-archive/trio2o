@@ -11,13 +11,23 @@
 # under the License.
 
 from trio2o.common.scheduler.filters import base_filters
+from trio2o.db import api as db_api
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
-    """Returns all bottom pods."""
+class RamFilter(base_filters.BasePodFilter):
+    """Returns all available pods that have as much available memory space
 
+     as asked.
+     """
     def is_pod_passed(self, context, pod, request_spec):
-        flag = False
-        if pod['az_name'] != '':
-            flag = True
+        flag = True
+        pod_state = db_api.get_pod_state_by_pod_id(context, pod['pod_id'])[0]
+        free_ram_space = pod_state['memory_mb'] - pod_state['memory_mb_used']
+
+        if not isinstance(request_spec, dict):
+            request_spec = request_spec.to_dict()
+        req_ram_space = request_spec['memory_mb']
+        if req_ram_space is not None and req_ram_space > free_ram_space:
+            flag = False
+
         return flag

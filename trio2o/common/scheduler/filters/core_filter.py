@@ -11,13 +11,25 @@
 # under the License.
 
 from trio2o.common.scheduler.filters import base_filters
+from trio2o.db import api as db_api
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
-    """Returns all bottom pods."""
+class CoreFilter(base_filters.BasePodFilter):
+    """Returns all available pods that have as much available disk space
+
+     as asked.
+     """
 
     def is_pod_passed(self, context, pod, request_spec):
-        flag = False
-        if pod['az_name'] != '':
-            flag = True
+        # If the pod has enough free disk space, then it will pass the filter.
+        flag = True
+        pod_state = db_api.get_pod_state_by_pod_id(context, pod['pod_id'])[0]
+        free_vcpus = pod_state['vcpus'] - pod_state['vcpus_used']
+
+        if not isinstance(request_spec, dict):
+            request_spec = request_spec.to_dict()
+        req_vcpus = request_spec['vcpus']
+        if req_vcpus is not None and req_vcpus > free_vcpus:
+            flag = False
+
         return flag

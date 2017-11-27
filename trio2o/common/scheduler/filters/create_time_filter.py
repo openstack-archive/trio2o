@@ -13,11 +13,19 @@
 from trio2o.common.scheduler.filters import base_filters
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
-    """Returns all bottom pods."""
+class CreateTimeFilter(base_filters.BasePodFilter):
+    """Returns all available pods that are created after certain date."""
 
     def is_pod_passed(self, context, pod, request_spec):
-        flag = False
-        if pod['az_name'] != '':
-            flag = True
+        # If the pod was created after certain date, then it will pass
+        # the filter.
+        flag = True
+        create_time = pod['create_time']
+
+        if not isinstance(request_spec, dict):
+            request_spec = request_spec.to_dict()
+        req_create_time = request_spec['create_time']
+        if req_create_time is not None and create_time < req_create_time:
+            flag = False
+
         return flag

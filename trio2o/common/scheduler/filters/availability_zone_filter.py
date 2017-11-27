@@ -13,11 +13,17 @@
 from trio2o.common.scheduler.filters import base_filters
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
-    """Returns all bottom pods."""
+class AvailabilityZoneFilter(base_filters.BasePodFilter):
+    """Returns all available pods in specified availability zone."""
 
     def is_pod_passed(self, context, pod, request_spec):
-        flag = False
-        if pod['az_name'] != '':
-            flag = True
+        # If the pod locates in specified availability zone, then it will pass
+        # the filter.
+        flag = True
+
+        if not isinstance(request_spec, dict):
+            request_spec = request_spec.to_dict()
+        req_az_name = request_spec['az_name']
+        if req_az_name is not None and req_az_name != pod['az_name']:
+            flag = False
         return flag

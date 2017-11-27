@@ -35,19 +35,23 @@ class PodManagerTest(unittest.TestCase):
         ).driver
         self.b_pod_1 = {'pod_id': 'b_pod_pm_uuid_1',
                         'pod_name': 'b_region_pm_1',
-                        'az_name': self.az_name_1}
+                        'az_name': self.az_name_1,
+                        'is_under_maintenance': False}
 
         self.b_pod_2 = {'pod_id': 'b_pod_pm_uuid_2',
                         'pod_name': 'b_region_pm_2',
-                        'az_name': self.az_name_2}
+                        'az_name': self.az_name_2,
+                        'is_under_maintenance': False}
 
         self.b_pod_3 = {'pod_id': 'b_pod_pm_uuid_3',
                         'pod_name': 'b_region_pm_3',
-                        'az_name': self.az_name_2}
+                        'az_name': self.az_name_2,
+                        'is_under_maintenance': False}
 
         self.b_pod_4 = {'pod_id': 'b_pod_pm_uuid_4',
                         'pod_name': 'b_region_pm_4',
-                        'az_name': self.az_name_2}
+                        'az_name': self.az_name_2,
+                        'is_under_maintenance': False}
 
     def test_get_current_binding_and_pod(self):
         api.create_pod(self.context, self.b_pod_1)
@@ -139,3 +143,6 @@ class PodManagerTest(unittest.TestCase):
         self.assertEqual(binding_q[1]['pod_id'], self.b_pod_4['pod_id'])
         self.assertEqual(binding_q[1]['tenant_id'], 'new_project_pm_3')
         self.assertEqual(binding_q[1]['is_binding'], True)
+
+    def tearDown(self):
+        core.ModelBase.metadata.drop_all(core.get_engine())

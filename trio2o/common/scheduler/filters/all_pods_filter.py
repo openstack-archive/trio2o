@@ -13,11 +13,9 @@
 from trio2o.common.scheduler.filters import base_filters
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
-    """Returns all bottom pods."""
+class AllPodFilter(base_filters.BasePodFilter):
+    """Returns all available pods."""
 
     def is_pod_passed(self, context, pod, request_spec):
-        flag = False
-        if pod['az_name'] != '':
-            flag = True
-        return flag
+        # If the pod is under maintenance, then it will pass the filter.
+        return not pod['is_under_maintenance']

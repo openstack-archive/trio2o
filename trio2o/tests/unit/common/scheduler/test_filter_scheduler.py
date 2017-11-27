@@ -38,18 +38,18 @@ class FilterSchedulerTest(unittest.TestCase):
 
     def test_select_destination(self):
         b_pod_1 = {'pod_id': 'b_pod_fs_uuid_1', 'pod_name': 'b_region_fs_1',
-                   'az_name': self.az_name_1}
+                   'az_name': self.az_name_1, 'is_under_maintenance': False}
         api.create_pod(self.context, b_pod_1)
         b_pod_2 = {'pod_id': 'b_pod_fs_uuid_2', 'pod_name': 'b_region_fs_2',
-                   'az_name': self.az_name_2}
+                   'az_name': self.az_name_2, 'is_under_maintenance': False}
         api.create_pod(self.context, b_pod_2)
         b_pod_3 = {'pod_id': 'b_pod_fs_uuid_3', 'pod_name': 'b_region_fs_3',
-                   'az_name': self.az_name_2}
+                   'az_name': self.az_name_2, 'is_under_maintenance': False}
         api.create_pod(self.context, b_pod_3)
 
         t_pod = {'pod_id': 'b_pod_fs_uuid_t_pod',
                  'pod_name': 'b_region_fs_t_pod',
-                 'az_name': ''}
+                 'az_name': '', 'is_under_maintenance': False}
         api.create_pod(self.context, t_pod)
         self._prepare_binding(b_pod_1['pod_id'])
         binding_q = core.query_resource(
@@ -80,17 +80,6 @@ class FilterSchedulerTest(unittest.TestCase):
                                                'value': 'new_project'}], [])
         self.assertEqual(len(binding_q), 1)
         self.assertEqual(binding_q[0]['pod_id'], pod_2['pod_id'])
-        self.assertEqual(binding_q[0]['tenant_id'], 'new_project')
-        self.assertEqual(binding_q[0]['is_binding'], True)
-
-        pod_3, _ = self.filter_scheduler.select_destination(
-            self.context, self.az_name_1, 'new_project', pod_group='')
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': 'new_project'}], [])
-        self.assertEqual(len(binding_q), 1)
-        self.assertEqual(binding_q[0]['pod_id'], pod_3['pod_id'])
         self.assertEqual(binding_q[0]['tenant_id'], 'new_project')
         self.assertEqual(binding_q[0]['is_binding'], True)
 
@@ -139,3 +128,6 @@ class FilterSchedulerTest(unittest.TestCase):
         self.assertEqual(binding_q[2]['pod_id'], pod_7['pod_id'])
         self.assertEqual(binding_q[2]['tenant_id'], self.project_id)
         self.assertEqual(binding_q[2]['is_binding'], True)
+
+    def tearDown(self):
+        core.ModelBase.metadata.drop_all(core.get_engine())

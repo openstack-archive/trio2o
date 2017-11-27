@@ -104,6 +104,6 @@ class PodManager(object):
             filter_q = None
         pods = db_api.list_pods(context, filter_q)
         for filter_ in self.default_filters:
-            objs_ = filter_.filter_all(pods, pod_group)
+            objs_ = filter_.filter_all(context, pods, pod_group)
             pods = list(objs_)
         return pods

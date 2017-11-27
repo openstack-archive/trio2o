@@ -11,13 +11,22 @@
 # under the License.
 
 from trio2o.common.scheduler.filters import base_filters
+from trio2o.db import api as db_api
 
 
-class BottomPodFilter(base_filters.BasePodFilter):
-    """Returns all bottom pods."""
+class TenantFilter(base_filters.BasePodFilter):
+    """Returns all the pods that have been bound with the tenant."""
 
     def is_pod_passed(self, context, pod, request_spec):
-        flag = False
-        if pod['az_name'] != '':
-            flag = True
+        flag = True
+
+        if not isinstance(request_spec, dict):
+            request_spec = request_spec.to_dict()
+        project_id = request_spec['project_id']
+        filter_binding = [{'key': 'tenant_id', 'comparator': 'eq',
+                           'value': project_id}]
+        current_binding = db_api.get_pod_binding_by_tenant_id(context,
+                                                              filter_binding)
+        if not current_binding:
+            flag = False
         return flag
