@@ -11,10 +11,12 @@
 # under the License.
 
 from trio2o.common import context
+from trio2o.common import request_spec
 from trio2o.common.scheduler import filter_scheduler
 from trio2o.db import api
 from trio2o.db import core
-from trio2o.db import models
+from trio2o.tests.unit.common.scheduler import utils
+
 import unittest
 
 
@@ -27,6 +29,22 @@ class FilterSchedulerTest(unittest.TestCase):
         self.project_id = 'test_fs_project'
         self.az_name_1 = 'b_az_fs_1'
         self.az_name_2 = 'b_az_fs_2'
+
+        self.b_pod_1 = {'pod_id': 'b_pod_fs_uuid_1',
+                        'pod_name': 'b_region_fs_1',
+                        'az_name': self.az_name_1,
+                        'is_under_maintenance': False}
+
+        self.b_pod_2 = {'pod_id': 'b_pod_fs_uuid_2',
+                        'pod_name': 'b_region_fs_2',
+                        'az_name': self.az_name_2,
+                        'is_under_maintenance': False}
+
+        self.b_pod_3 = {'pod_id': 'b_pod_fs_uuid_3',
+                        'pod_name': 'b_region_fs_3',
+                        'az_name': self.az_name_2,
+                        'is_under_maintenance': False}
+
         self.filter_scheduler = filter_scheduler.FilterScheduler()
 
     def _prepare_binding(self, pod_id):
@@ -37,105 +55,36 @@ class FilterSchedulerTest(unittest.TestCase):
         return binding
 
     def test_select_destination(self):
-        b_pod_1 = {'pod_id': 'b_pod_fs_uuid_1', 'pod_name': 'b_region_fs_1',
-                   'az_name': self.az_name_1}
-        api.create_pod(self.context, b_pod_1)
-        b_pod_2 = {'pod_id': 'b_pod_fs_uuid_2', 'pod_name': 'b_region_fs_2',
-                   'az_name': self.az_name_2}
-        api.create_pod(self.context, b_pod_2)
-        b_pod_3 = {'pod_id': 'b_pod_fs_uuid_3', 'pod_name': 'b_region_fs_3',
-                   'az_name': self.az_name_2}
-        api.create_pod(self.context, b_pod_3)
+        for count, pod in enumerate((self.b_pod_1, self.b_pod_2,
+                                     self.b_pod_3)):
+            api.create_pod(self.context, pod)
+            # disk=4gb*(count+1), ram=1024mb*(count+1), vcpus=4*(count+1)
+            utils.create_pod_state_for_pod(self.context, pod['pod_id'],
+                                           count+1)
+        spec_obj = request_spec.RequestSpec(self.project_id,
+                                            disk_gb=8,
+                                            memory_mb=1024)
 
-        t_pod = {'pod_id': 'b_pod_fs_uuid_t_pod',
-                 'pod_name': 'b_region_fs_t_pod',
-                 'az_name': ''}
-        api.create_pod(self.context, t_pod)
-        self._prepare_binding(b_pod_1['pod_id'])
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': self.project_id}], [])
-        self.assertEqual(binding_q[0]['pod_id'], b_pod_1['pod_id'])
-        self.assertEqual(binding_q[0]['tenant_id'], self.project_id)
-        self.assertEqual(binding_q[0]['is_binding'], True)
+        # b_pod_3 has biggest weight, so the filter scheduler returns b_pod_3
+        pod = self.filter_scheduler.select_destination(self.context, spec_obj)
+        self.assertEqual("b_region_fs_3", pod['pod_name'])
+        self.assertEqual("b_pod_fs_uuid_3", pod['pod_id'])
 
-        pod_1, _ = self.filter_scheduler.select_destination(
-            self.context, '', self.project_id, pod_group='')
-        self.assertEqual(pod_1['pod_id'], b_pod_1['pod_id'])
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': self.project_id}], [])
-        self.assertEqual(len(binding_q), 1)
-        self.assertEqual(binding_q[0]['pod_id'], pod_1['pod_id'])
-        self.assertEqual(binding_q[0]['tenant_id'], self.project_id)
-        self.assertEqual(binding_q[0]['is_binding'], True)
+        # request has pod affinity tag, so filter scheduler will returns the
+        # pod meet requirements, we create pod affinity tag for b_pod_2, so
+        # even b_pod_3 has biggest weight, but filter scheduler will returns
+        # b_pod_2.
+        key_value_pairs = {"volume": 'SSD'}
+        utils.create_pod_affinity_tag(self.context, self.b_pod_2['pod_id'],
+                                      **key_value_pairs)
 
-        pod_2, _ = self.filter_scheduler.select_destination(
-            self.context, '', 'new_project', pod_group='')
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': 'new_project'}], [])
-        self.assertEqual(len(binding_q), 1)
-        self.assertEqual(binding_q[0]['pod_id'], pod_2['pod_id'])
-        self.assertEqual(binding_q[0]['tenant_id'], 'new_project')
-        self.assertEqual(binding_q[0]['is_binding'], True)
+        spec_obj = request_spec.RequestSpec(self.project_id,
+                                            disk_gb=8,
+                                            memory_mb=2048,
+                                            affinity_tags={'volume': "SSD"})
+        pod = self.filter_scheduler.select_destination(self.context, spec_obj)
+        self.assertEqual("b_region_fs_2", pod['pod_name'])
+        self.assertEqual("b_pod_fs_uuid_2", pod['pod_id'])
 
-        pod_3, _ = self.filter_scheduler.select_destination(
-            self.context, self.az_name_1, 'new_project', pod_group='')
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': 'new_project'}], [])
-        self.assertEqual(len(binding_q), 1)
-        self.assertEqual(binding_q[0]['pod_id'], pod_3['pod_id'])
-        self.assertEqual(binding_q[0]['tenant_id'], 'new_project')
-        self.assertEqual(binding_q[0]['is_binding'], True)
-
-        pod_4, _ = self.filter_scheduler.select_destination(
-            self.context, self.az_name_2, 'new_project', pod_group='')
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': 'new_project'}], [])
-        self.assertEqual(len(binding_q), 2)
-        self.assertEqual(binding_q[1]['pod_id'], pod_4['pod_id'])
-        self.assertEqual(binding_q[1]['tenant_id'], 'new_project')
-        self.assertEqual(binding_q[1]['is_binding'], True)
-
-        pod_5, _ = self.filter_scheduler.select_destination(
-            self.context, self.az_name_2, self.project_id, pod_group='')
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': self.project_id}], [])
-        self.assertEqual(len(binding_q), 2)
-        self.assertEqual(pod_5['az_name'], self.az_name_2)
-        self.assertEqual(binding_q[1]['pod_id'], pod_5['pod_id'])
-        self.assertEqual(binding_q[1]['tenant_id'], self.project_id)
-        self.assertEqual(binding_q[1]['is_binding'], True)
-
-        pod_6, _ = self.filter_scheduler.select_destination(
-            self.context, self.az_name_1, self.project_id, pod_group='test')
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': self.project_id}], [])
-        self.assertEqual(len(binding_q), 2)
-        self.assertEqual(pod_6, None)
-
-        pod_7, _ = self.filter_scheduler.select_destination(
-            self.context, self.az_name_2, self.project_id, pod_group='test')
-        binding_q = core.query_resource(
-            self.context, models.PodBinding, [{'key': 'tenant_id',
-                                               'comparator': 'eq',
-                                               'value': self.project_id}], [])
-        self.assertEqual(len(binding_q), 3)
-        self.assertEqual(pod_7['az_name'], self.az_name_2)
-        self.assertEqual(binding_q[1]['tenant_id'], self.project_id)
-        self.assertEqual(binding_q[1]['is_binding'], False)
-        self.assertEqual(binding_q[2]['pod_id'], pod_7['pod_id'])
-        self.assertEqual(binding_q[2]['tenant_id'], self.project_id)
-        self.assertEqual(binding_q[2]['is_binding'], True)
+    def tearDown(self):
+        core.ModelBase.metadata.drop_all(core.get_engine())

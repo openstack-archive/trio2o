@@ -124,7 +124,8 @@ class MicroVersionFunctionTest(base.TestCase):
         pod_dict = {
             'pod_id': 'fake_pod_id',
             'pod_name': 'fake_pod_name',
-            'az_name': FAKE_AZ
+            'az_name': FAKE_AZ,
+            'is_under_maintenance': False
         }
 
         config_dict = {
@@ -137,7 +138,8 @@ class MicroVersionFunctionTest(base.TestCase):
         pod_dict2 = {
             'pod_id': 'fake_pod_id' + '2',
             'pod_name': 'fake_pod_name' + '2',
-            'az_name': FAKE_AZ + '2'
+            'az_name': FAKE_AZ + '2',
+            'is_under_maintenance': False
         }
 
         config_dict2 = {
@@ -150,7 +152,8 @@ class MicroVersionFunctionTest(base.TestCase):
         top_pod = {
             'pod_id': 'fake_top_pod_id',
             'pod_name': 'RegionOne',
-            'az_name': ''
+            'az_name': '',
+            'is_under_maintenance': False
         }
 
         top_config = {

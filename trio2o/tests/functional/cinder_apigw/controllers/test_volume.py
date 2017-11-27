@@ -37,6 +37,7 @@ from trio2o.db import api as db_api
 from trio2o.db import core
 
 from trio2o.tests import base
+from trio2o.tests.unit.common.scheduler import utils
 
 
 OPT_GROUP_NAME = 'keystone_authtoken'
@@ -177,7 +178,8 @@ class CinderVolumeFunctionalTest(base.TestCase):
         pod_dict = {
             'pod_id': 'fake_pod_id',
             'pod_name': 'fake_pod_name',
-            'az_name': FAKE_AZ
+            'az_name': FAKE_AZ,
+            'is_under_maintenance': False
         }
 
         config_dict = {
@@ -190,7 +192,8 @@ class CinderVolumeFunctionalTest(base.TestCase):
         pod_dict2 = {
             'pod_id': 'fake_pod_id' + '2',
             'pod_name': 'fake_pod_name' + '2',
-            'az_name': FAKE_AZ + '2'
+            'az_name': FAKE_AZ + '2',
+            'is_under_maintenance': False
         }
 
         config_dict2 = {
@@ -203,7 +206,8 @@ class CinderVolumeFunctionalTest(base.TestCase):
         top_pod = {
             'pod_id': 'fake_top_pod_id',
             'pod_name': 'RegionOne',
-            'az_name': ''
+            'az_name': '',
+            'is_under_maintenance': False
         }
 
         top_config = {
@@ -213,9 +217,15 @@ class CinderVolumeFunctionalTest(base.TestCase):
             'service_url': 'http://127.0.0.1:19998/v2/$(tenant_id)s'
         }
 
-        db_api.create_pod(self.context, pod_dict)
-        db_api.create_pod(self.context, pod_dict2)
-        db_api.create_pod(self.context, top_pod)
+        pod = db_api.create_pod(self.context, pod_dict)
+        utils.create_pod_state_for_pod(self.context, pod['pod_id'])
+
+        pod = db_api.create_pod(self.context, pod_dict2)
+        utils.create_pod_state_for_pod(self.context, pod['pod_id'])
+
+        pod = db_api.create_pod(self.context, top_pod)
+        utils.create_pod_state_for_pod(self.context, pod['pod_id'])
+
         db_api.create_pod_service_configuration(self.context, config_dict)
         db_api.create_pod_service_configuration(self.context, config_dict2)
         db_api.create_pod_service_configuration(self.context, top_config)
@@ -270,11 +280,11 @@ class TestVolumeController(CinderVolumeFunctionalTest):
                 },
                 "expected_error": 500
             },
-
             ]
 
         self._test_and_check(volumes, 'my_tenant_id')
 
+    @staticmethod
     def fake_create_resource(context, ag_name, az_name):
         raise Exception
 

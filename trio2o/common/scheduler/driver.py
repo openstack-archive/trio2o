@@ -27,5 +27,5 @@ class Scheduler(object):
         ).driver
 
     @abc.abstractmethod
-    def select_destination(self, context, az_name, tenant_id, spec_obj):
-        return None, None
+    def select_destination(self, context, spec_obj):
+        return None

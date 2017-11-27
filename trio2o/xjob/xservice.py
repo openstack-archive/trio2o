@@ -98,7 +98,7 @@ class XService(srv.Service):
         self.topic = topic
         self.manager = manager
         self.rpc_server = None
-        self.report_interval = report_interval
+        self.report_interval = _TIMER_INTERVAL
         self.periodic_enable = periodic_enable
         self.periodic_fuzzy_delay = periodic_fuzzy_delay
         self.interval_max = periodic_interval_max
@@ -232,7 +232,7 @@ def create_service():
         topic=topics.TOPIC_XJOB,
         manager=xmanager,
         periodic_enable=True,
-        report_interval=_TIMER_INTERVAL,
+        report_interval=None,
         periodic_interval_max=_TIMER_INTERVAL_MAX,
         serializer=Serializer()
     )
