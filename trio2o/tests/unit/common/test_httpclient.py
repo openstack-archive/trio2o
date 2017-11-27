@@ -130,7 +130,8 @@ class HttpClientTest(unittest.TestCase):
         pod_dict = {
             'pod_id': 'fake_pod_id',
             'pod_name': 'fake_pod_name',
-            'az_name': 'fake_az'
+            'az_name': 'fake_az',
+            'is_under_maintenance': False
         }
 
         config_dict = {
@@ -185,7 +186,8 @@ class HttpClientTest(unittest.TestCase):
         pod_dict = {
             'pod_id': 'fake_pod_id',
             'pod_name': 'fake_pod_name',
-            'az_name': 'fake_az'
+            'az_name': 'fake_az',
+            'is_under_maintenance': False
         }
         api.create_pod(self.context, pod_dict)
 

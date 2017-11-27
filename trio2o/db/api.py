@@ -67,15 +67,10 @@ def update_pod(context, pod_id, update_dict):
         return core.update_resource(context, models.Pod, pod_id, update_dict)
 
 
-def change_pod_binding(context, pod_binding, pod_id):
+def update_pod_binding(context, pod_binding_id, update_dict):
     with context.session.begin():
         core.update_resource(context, models.PodBinding,
-                             pod_binding['id'], pod_binding)
-        core.create_resource(context, models.PodBinding,
-                             {'id': uuidutils.generate_uuid(),
-                              'tenant_id': pod_binding['tenant_id'],
-                              'pod_id': pod_id,
-                              'is_binding': True})
+                             pod_binding_id, update_dict)
 
 
 def get_pod_binding_by_tenant_id(context, filter_):
@@ -101,6 +96,80 @@ def create_pod_binding(context, tenant_id, pod_id):
                                      'tenant_id': tenant_id,
                                      'pod_id': pod_id,
                                      'is_binding': True})
+
+
+def create_pod_state(context, pod_state_dict):
+    with context.session.begin():
+        return core.create_resource(context, models.PodState, pod_state_dict)
+
+
+def delete_pod_state(context, pod_state_id):
+    with context.session.begin():
+        return core.delete_resource(context, models.PodState, pod_state_id)
+
+
+def get_pod_state(context, pod_state_id):
+    with context.session.begin():
+        return core.get_resource(context, models.PodState, pod_state_id)
+
+
+def get_pod_state_by_pod_id(context, pod_id):
+    pod_id_filter = [{'key': 'pod_id', 'comparator': 'eq', 'value': pod_id}]
+
+    try:
+        pod_state_obj = list_pod_states(context, pod_id_filter)
+        if len(pod_state_obj) > 1:
+            raise Exception
+        elif not pod_state_obj:
+            return None
+        else:
+            return pod_state_obj[0]
+    except Exception:
+        raise exceptions.Duplicate()
+
+
+def list_pod_states(context, filters=None, sorts=None):
+    with context.session.begin():
+        return core.query_resource(context, models.PodState, filters or [],
+                                   sorts or [])
+
+
+def update_pod_state(context, pod_state_id, update_dict):
+    with context.session.begin():
+        return core.update_resource(context, models.PodState, pod_state_id,
+                                    update_dict)
+
+
+def create_pod_affinity_tag(context, pod_affinity_tag_dict):
+    with context.session.begin():
+        return core.create_resource(context, models.PodAffinityTag,
+                                    pod_affinity_tag_dict)
+
+
+def delete_pod_affinity_tag(context, pod_affinity_tag_id):
+    with context.session.begin():
+        return core.delete_resource(context, models.PodAffinityTag,
+                                    pod_affinity_tag_id)
+
+
+def get_pod_affinity_tag(context, pod_affinity_tag_id):
+    with context.session.begin():
+        return core.get_resource(context, models.PodAffinityTag,
+                                 pod_affinity_tag_id)
+
+
+def list_pod_affinity_tag(context, filters=None, sorts=None):
+    with context.session.begin():
+        return core.query_resource(context, models.PodAffinityTag,
+                                   filters or [], sorts or [])
+
+
+def update_pod_affinity_tag(context, pod_affinity_tag_id,
+                            pod_affinity_tag_dict):
+    with context.session.begin():
+        return core.update_resource(context, models.PodAffinityTag,
+                                    pod_affinity_tag_id,
+                                    pod_affinity_tag_dict)
 
 
 def delete_pod_service_configuration(context, config_id):
@@ -149,6 +218,12 @@ def get_bottom_mappings_by_top_id(context, top_id, resource_type):
             pod = core.get_resource(context, models.Pod, route['pod_id'])
             mappings.append((pod, route['bottom_id']))
     return mappings
+
+
+def create_resource_routing(context, routing_dict):
+    with context.session.begin():
+        return core.create_resource(context, models.ResourceRouting,
+                                    routing_dict)
 
 
 def get_bottom_id_by_top_id_pod_name(context, top_id, pod_name, resource_type):
@@ -1265,3 +1340,9 @@ def volume_type_project_query(context, session=None, inactive=False,
     filters = filters or {}
     return model_query(context, models.VolumeTypeProjects, session=session,
                        read_deleted=read_deleted).filter_by(**filters)
+
+
+def list_podbindings(context, filters=None, sorts=None):
+    with context.session.begin():
+        return core.query_resource(context, models.PodBinding, filters or [],
+                                   sorts or [])

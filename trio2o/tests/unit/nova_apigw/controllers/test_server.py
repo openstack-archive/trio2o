@@ -17,22 +17,24 @@ import copy
 import datetime
 import mock
 from mock import patch
+from oslo_config import cfg
 import pecan
 import unittest
 
 from oslo_utils import uuidutils
 
+from trio2o.api import app
 from trio2o.common import constants
 from trio2o.common import context
 import trio2o.common.exceptions as t_exceptions
 from trio2o.common import lock_handle
-from trio2o.common.scheduler import filter_scheduler
+from trio2o.common.scheduler import manager
 from trio2o.common import xrpcapi
 from trio2o.db import api
 from trio2o.db import core
 from trio2o.db import models
 from trio2o.nova_apigw.controllers import server
-
+from trio2o.tests.unit.common.scheduler import utils
 
 TOP_NETS = []
 TOP_SUBNETS = []
@@ -42,10 +44,14 @@ BOTTOM1_NETS = []
 BOTTOM1_SUBNETS = []
 BOTTOM1_PORTS = []
 BOTTOM1_SGS = []
+BOTTOM1_HYPERVISOR_STATS = []
+BOTTOM1_HYPERVISORS = []
 BOTTOM2_NETS = []
 BOTTOM2_SUBNETS = []
 BOTTOM2_PORTS = []
 BOTTOM2_SGS = []
+BOTTOM2_HYPERVISOR_STATS = []
+BOTTOM2_HYPERVISORS = []
 
 BOTTOM_NETS = BOTTOM1_NETS
 BOTTOM_SUBNETS = BOTTOM1_SUBNETS
@@ -55,7 +61,9 @@ BOTTOM_SERVERS = []
 
 RES_LIST = [TOP_NETS, TOP_SUBNETS, TOP_PORTS, TOP_SGS, BOTTOM_SERVERS,
             BOTTOM1_NETS, BOTTOM1_SUBNETS, BOTTOM1_PORTS, BOTTOM1_SGS,
-            BOTTOM2_NETS, BOTTOM2_SUBNETS, BOTTOM2_PORTS, BOTTOM2_SGS]
+            BOTTOM2_NETS, BOTTOM2_SUBNETS, BOTTOM2_PORTS, BOTTOM2_SGS,
+            BOTTOM1_HYPERVISOR_STATS, BOTTOM1_HYPERVISORS,
+            BOTTOM2_HYPERVISOR_STATS, BOTTOM2_HYPERVISORS]
 
 
 def _get_ip_suffix():
@@ -83,7 +91,7 @@ class FakeServerController(server.ServerController):
         self.clients = {'t_region': FakeClient('t_region')}
         self.project_id = project_id
         self.xjob_handler = xrpcapi.XJobAPI()
-        self.filter_scheduler = filter_scheduler.FilterScheduler()
+        self.manager = manager.SchedulerManager()
 
     def _get_client(self, pod_name=None):
         if not pod_name:
@@ -104,11 +112,16 @@ class FakeClient(object):
                            'subnet': BOTTOM_SUBNETS,
                            'port': BOTTOM_PORTS,
                            'security_group': BOTTOM_SGS,
-                           'server': BOTTOM_SERVERS},
+                           'server': BOTTOM_SERVERS,
+                           'hypervisor_stat': BOTTOM1_HYPERVISOR_STATS,
+                           'hypervisor': BOTTOM1_HYPERVISORS},
+
                 'bottom2': {'network': BOTTOM2_NETS,
                             'subnet': BOTTOM2_SUBNETS,
                             'port': BOTTOM2_PORTS,
-                            'security_group': BOTTOM2_SGS}}
+                            'security_group': BOTTOM2_SGS,
+                            'hypervisor_stat': BOTTOM2_HYPERVISOR_STATS,
+                            'hypervisor': BOTTOM2_HYPERVISORS}}
 
     def __init__(self, pod_name):
         if not pod_name:
@@ -287,9 +300,18 @@ class FakeClient(object):
     def delete_servers(self, ctx, _id):
         pass
 
+    def list_hypervisor_stats(self, ctx):
+        return self.list_resources('hypervisor_stat', ctx, [])
+
+    def list_hypervisors(self, ctx):
+        return self.list_resources('hypervisor', ctx, [])
+
 
 class ServerTest(unittest.TestCase):
     def setUp(self):
+        cfg.CONF.clear()
+        cfg.CONF.register_opts(app.common_opts)
+
         core.initialize()
         core.ModelBase.metadata.create_all(core.get_engine())
         self.context = context.Context()
@@ -298,19 +320,23 @@ class ServerTest(unittest.TestCase):
 
     def _prepare_pod(self, bottom_pod_num=1):
         t_pod = {'pod_id': 't_pod_uuid', 'pod_name': 't_region',
-                 'az_name': ''}
+                 'az_name': '', 'is_under_maintenance': False}
         api.create_pod(self.context, t_pod)
         if bottom_pod_num == 1:
             b_pod = {'pod_id': 'b_pod_uuid', 'pod_name': 'b_region',
-                     'az_name': 'b_az'}
+                     'az_name': 'b_az', 'is_under_maintenance': False}
             api.create_pod(self.context, b_pod)
+            utils.create_pod_state_for_pod(self.context, b_pod['pod_id'])
             return t_pod, b_pod
         b_pods = []
         for i in xrange(1, bottom_pod_num + 1):
             b_pod = {'pod_id': 'b_pod_%d_uuid' % i,
                      'pod_name': 'b_region_%d' % i,
-                     'az_name': 'b_az_%d' % i}
+                     'az_name': 'b_az_%d' % i,
+                     'is_under_maintenance': False,
+                     }
             api.create_pod(self.context, b_pod)
+            utils.create_pod_state_for_pod(self.context, b_pod['pod_id'], i+1)
             b_pods.append(b_pod)
         return t_pod, b_pods
 
@@ -377,6 +403,7 @@ class ServerTest(unittest.TestCase):
     @patch.object(context, 'extract_context_from_environ')
     def test_post(self, mock_ctx, mock_create):
         t_pod, b_pod = self._prepare_pod()
+
         top_net_id = 'top_net_id'
         top_subnet_id = 'top_subnet_id'
         top_sg_id = 'top_sg_id'
@@ -823,6 +850,7 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(flavor_id, ret_server['flavor'])
 
     def tearDown(self):
+        cfg.CONF.unregister_opts(app.common_opts)
         core.ModelBase.metadata.drop_all(core.get_engine())
         for res in RES_LIST:
             del res[:]

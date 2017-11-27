@@ -14,6 +14,8 @@
 #    under the License.
 
 import trio2o.common.client
+import trio2o.common.scheduler.filter_scheduler
+import trio2o.common.scheduler.manager
 
 # Todo: adding rpc cap negotiation configuration after first release
 # import trio2o.common.xrpcapi
@@ -22,5 +24,8 @@ import trio2o.common.client
 def list_opts():
     return [
         ('client', trio2o.common.client.client_opts),
+        ('filter_scheduler',
+         trio2o.common.scheduler.filter_scheduler.filter_scheduler_opts)
+        ('scheduler', trio2o.common.scheduler.manager.scheduler_opts)
         # ('upgrade_levels', trio2o.common.xrpcapi.rpcapi_cap_opt),
     ]

@@ -210,9 +210,12 @@ def _convert_into_with_meta(item, resp):
 class NovaResourceHandle(ResourceHandle):
     service_type = cons.ST_NOVA
     support_resource = {'flavor': LIST,
+                        'hypervisor_stat': LIST,
+                        'hypervisor': LIST,
                         'server': LIST | CREATE | DELETE | GET | ACTION,
                         'aggregate': LIST | CREATE | DELETE | ACTION,
-                        'server_volume': ACTION}
+                        'server_volume': ACTION
+                        }
 
     def _get_client(self, cxt):
         url = self.endpoint_url.replace('$(tenant_id)s', cxt.tenant)
@@ -241,6 +244,17 @@ class NovaResourceHandle(ResourceHandle):
                 search_opts = _transform_filters(filters)
                 return [res.to_dict() for res in getattr(
                     client, collection).list(search_opts=search_opts)]
+            # list hypervisor state, the
+            # novaclient.hypervisor_stats.statistics() function will meet
+            # the requirements.
+            elif resource == 'hypervisor_stat':
+                return getattr(client, collection).statistics().to_dict()
+            elif resource == 'service':
+                search_opts = _transform_filters(filters)
+                host = search_opts.get('host')
+                binary = search_opts.get('binary')
+                return [res.to_dict() for res in getattr(
+                    client, collection).list(host, binary)]
             else:
                 return [res.to_dict() for res in getattr(client,
                                                          collection).list()]

@@ -20,9 +20,9 @@ from oslo_config import cfg
 from oslo_log import log as logging
 import oslo_messaging as messaging
 
-import rpc
-from serializer import Trio2oSerializer as Serializer
-import topics
+from trio2o.common import rpc
+from trio2o.common.serializer import Trio2oSerializer as Serializer
+from trio2o.common import topics
 
 from trio2o.common import constants
 

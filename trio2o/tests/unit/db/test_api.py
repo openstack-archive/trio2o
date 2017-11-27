@@ -17,6 +17,8 @@ import datetime
 import six
 import unittest
 
+from oslo_utils import timeutils
+
 from trio2o.common import context
 from trio2o.common import exceptions
 from trio2o.common import quota
@@ -36,7 +38,8 @@ class APITest(unittest.TestCase):
         for i in xrange(3):
             pod = {'pod_id': 'test_pod_uuid_%d' % i,
                    'pod_name': 'test_pod_%d' % i,
-                   'az_name': 'test_az_uuid_%d' % i}
+                   'az_name': 'test_az_uuid_%d' % i,
+                   'is_under_maintenance': False}
             api.create_pod(self.context, pod)
         route1 = {
             'top_id': 'top_uuid',
@@ -66,7 +69,9 @@ class APITest(unittest.TestCase):
         for i in xrange(3):
             pod = {'pod_id': 'test_pod_uuid_%d' % i,
                    'pod_name': 'test_pod_%d' % i,
-                   'az_name': 'test_az_uuid_%d' % i}
+                   'az_name': 'test_az_uuid_%d' % i,
+                   'is_under_maintenance': False,
+                   'create_time': timeutils.utcnow()}
             api.create_pod(self.context, pod)
         routes = [
             {
@@ -169,6 +174,8 @@ class APITest(unittest.TestCase):
                    'pod_az_name': 'test_pod_az_name_%d' % i,
                    'dc_name': 'test_dc_name_%d' % i,
                    'az_name': 'test_az_uuid_%d' % i,
+                   'is_under_maintenance': False,
+                   'create_time': timeutils.utcnow()
                    }
             api.create_pod(self.context, pod)
             pods.append(pod)
