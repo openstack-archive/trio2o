@@ -103,6 +103,65 @@ def create_pod_binding(context, tenant_id, pod_id):
                                      'is_binding': True})
 
 
+def create_pod_state(context, pod_state_dict):
+    with context.session.begin():
+        return core.create_resource(context, models.PodState, pod_state_dict)
+
+
+def delete_pod_state(context, pod_state_id):
+    with context.session.begin():
+        return core.delete_resource(context, models.PodState, pod_state_id)
+
+
+def get_pod_state(context, pod_state_id):
+    with context.session.begin():
+        return core.get_resource(context, models.PodState, pod_state_id)
+
+
+def list_pod_states(context, filters=None, sorts=None):
+    with context.session.begin():
+        return core.query_resource(context, models.PodState, filters or [],
+                                   sorts or [])
+
+
+def update_pod_state(context, pod_state_id, update_dict):
+    with context.session.begin():
+        return core.update_resource(context, models.PodState, pod_state_id,
+                                    update_dict)
+
+
+def create_pod_affinity_tag(context, pod_affinity_tag_dict):
+    with context.session.begin():
+        return core.create_resource(context, models.PodAffinityTag,
+                                    pod_affinity_tag_dict)
+
+
+def delete_pod_affinity_tag(context, pod_affinity_tag_id):
+    with context.session.begin():
+        return core.delete_resource(context, models.PodAffinityTag,
+                                    pod_affinity_tag_id)
+
+
+def get_pod_affinity_tag(context, pod_affinity_tag_id):
+    with context.session.begin():
+        return core.get_resource(context, models.PodAffinityTag,
+                                 pod_affinity_tag_id)
+
+
+def list_pod_affinity_tag(context, filters=None, sorts=None):
+    with context.session.begin():
+        return core.query_resource(context, models.PodAffinityTag,
+                                   filters or [], sorts or [])
+
+
+def update_pod_affinity_tag(context, pod_affinity_tag_id,
+                            pod_affinity_tag_dict):
+    with context.session.begin():
+        return core.update_resource(context, models.PodAffinityTag,
+                                    pod_affinity_tag_id,
+                                    pod_affinity_tag_dict)
+
+
 def delete_pod_service_configuration(context, config_id):
     with context.session.begin():
         return core.delete_resource(context, models.PodServiceConfiguration,

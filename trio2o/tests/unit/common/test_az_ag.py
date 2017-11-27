@@ -65,7 +65,8 @@ class AZAGTest(unittest.TestCase):
         top_pod = {
             'pod_id': FAKE_TOP_ID,
             'pod_name': FAKE_TOP_NAME,
-            'az_name': ''
+            'az_name': '',
+            'is_under_maintenance': False
         }
 
         config_dict_top = {
@@ -78,13 +79,15 @@ class AZAGTest(unittest.TestCase):
         pod_dict = {
             'pod_id': FAKE_SITE_ID,
             'pod_name': FAKE_SITE_NAME,
-            'az_name': FAKE_AZ
+            'az_name': FAKE_AZ,
+            'is_under_maintenance': False
         }
 
         pod_dict2 = {
             'pod_id': FAKE_SITE_ID_2,
             'pod_name': FAKE_SITE_NAME_2,
-            'az_name': FAKE_AZ
+            'az_name': FAKE_AZ,
+            'is_under_maintenance': False
         }
 
         config_dict = {
