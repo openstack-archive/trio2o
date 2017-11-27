@@ -412,6 +412,42 @@ class PodServiceConfiguration(core.ModelBase, core.DictBase):
                              nullable=False)
 
 
+# Pod resources statistics: it makes a aggregate summary of resource
+# usage in one pod. Resources to be collected include vcpu, memory, disk
+# and VM booted in the pod. This is done by making summary statistics
+# for all enabled hypervisors over all compute nodes in ond pod. Every
+# pod has a corresponding record in table. The field 'current_workload'
+# is the number of tasks the hypervisor is responsible for. This will
+# be equal or greater than the number of active VMs on the system
+# (it can be greater when VMs are being deleted and the hypervisor is
+# still cleaning up).
+class PodState(core.ModelBase, core.DictBase):
+    __tablename__ = 'cascaded_pod_state'
+    attributes = ['pod_state_id', 'pod_id', 'count', 'vcpus', 'vcpus_used',
+                  'memory_mb', 'memory_mb_used', 'local_gb', 'local_gb_used',
+                  'free_ram_mb', 'free_disk_gb', 'current_workload',
+                  'running_vms', 'disk_available_least']
+
+    pod_state_id = sql.Column('pod_state_id', sql.String(length=64),
+                              primary_key=True)
+    pod_id = sql.Column('pod_id', sql.String(length=64),
+                        sql.ForeignKey('cascaded_pods.pod_id'),
+                        nullable=False)
+    count = sql.Column('count', sql.Integer, nullable=False)
+    vcpus = sql.Column('vcpus', sql.Integer, nullable=False)
+    vcpus_used = sql.Column('vcpus_used', sql.Integer, nullable=False)
+    memory_mb = sql.Column('memory_mb', sql.Integer, nullable=False)
+    memory_mb_used = sql.Column('memory_mb_used', sql.Integer, nullable=False)
+    local_gb = sql.Column('local_gb', sql.Integer, nullable=False)
+    local_gb_used = sql.Column('local_gb_used', sql.Integer, nullable=False)
+    free_ram_mb = sql.Column('free_ram_mb', sql.Integer, nullable=False)
+    free_disk_gb = sql.Column('free_disk_gb', sql.Integer, nullable=False)
+    current_workload = sql.Column('current_workload', sql.Integer)
+    running_vms = sql.Column('running_vms', sql.Integer)
+    disk_available_least = sql.Column('disk_available_least', sql.Integer,
+                                      nullable=False)
+
+
 # Tenant and pod binding model
 class PodBinding(core.ModelBase, core.DictBase, models.TimestampMixin):
     __tablename__ = 'pod_binding'
