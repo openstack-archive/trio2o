@@ -19,9 +19,8 @@ import inspect
 import six
 import uuid
 
-from keystoneclient.auth.identity import v3 as auth_identity
-from keystoneclient.auth import token_endpoint
-from keystoneclient import session
+from keystoneauth1.identity import v3 as auth_identity
+from keystoneauth1 import session
 from keystoneclient.v3 import client as keystone_client
 from oslo_config import cfg
 from oslo_log import log as logging
@@ -203,8 +202,8 @@ class Client(object):
         return self._get_keystone_session().get_project_id()
 
     def _get_endpoint_from_keystone(self, cxt):
-        auth = token_endpoint.Token(cfg.CONF.client.identity_url,
-                                    cxt.auth_token)
+        auth = auth_identity.Token(cfg.CONF.client.identity_url,
+                                   cxt.auth_token)
         sess = session.Session(auth=auth)
         cli = keystone_client.Client(session=sess)
 

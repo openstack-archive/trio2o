@@ -210,6 +210,8 @@ def _convert_into_with_meta(item, resp):
 class NovaResourceHandle(ResourceHandle):
     service_type = cons.ST_NOVA
     support_resource = {'flavor': LIST,
+                        'hypervisor_stat': LIST,
+                        'hypervisor': LIST,
                         'server': LIST | CREATE | DELETE | GET | ACTION,
                         'aggregate': LIST | CREATE | DELETE | ACTION,
                         'server_volume': ACTION}
@@ -241,6 +243,11 @@ class NovaResourceHandle(ResourceHandle):
                 search_opts = _transform_filters(filters)
                 return [res.to_dict() for res in getattr(
                     client, collection).list(search_opts=search_opts)]
+            # list hypervisor state, the
+            # novaclient.hypervisor_stats.statistics() function will meet
+            # the requirements.
+            elif resource == 'hypervisor_stat':
+                return getattr(client, collection).statistics().to_dict()
             else:
                 return [res.to_dict() for res in getattr(client,
                                                          collection).list()]

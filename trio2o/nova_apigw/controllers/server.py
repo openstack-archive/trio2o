@@ -19,6 +19,7 @@ from pecan import rest
 import six
 
 import oslo_log.log as logging
+from oslo_utils import uuidutils
 
 import trio2o.common.client as t_client
 from trio2o.common import constants
@@ -28,6 +29,7 @@ from trio2o.common.i18n import _
 from trio2o.common.i18n import _LE
 import trio2o.common.lock_handle as t_lock
 from trio2o.common.quota import QUOTAS
+from trio2o.common import request_spec
 from trio2o.common.scheduler import filter_scheduler
 from trio2o.common import utils
 from trio2o.common import xrpcapi
@@ -68,6 +70,80 @@ class ServerController(rest.RestController):
             servers = client.list_servers(context, filters=filters)
             ret.extend(servers)
         return ret
+
+    def pod_state_statistics(self, context):
+        """Resource statistics in one OpenStack instance(pod)
+
+        Pull pod usage information from cascaded pod by nova client.
+        According to this information we will update the pod state
+        in our own db. Summary statistics for all enabled hypervisors
+        over all compute nodes in one pod is called a single pod state.
+        This should be a periodic task, so later if we want to use all
+        pods usage statistics, we directly access the db and read data
+        from pod state table.
+
+        :param context: wsgi request object
+        :return: return nothing, update the pod state in db is enough
+        """
+
+        pods = db_api.list_pods(context)
+        for pod in pods:
+            if not pod['az_name']:
+                continue
+            client = self._get_client(pod['pod_name'])
+            hypervisor_stat = client.list_hypervisor_stats(context)
+
+            pod_state_filter = [{'key': 'pod_id',
+                                 'comparator': 'eq',
+                                 'value': pod['pod_id']}]
+            pod_states = db_api.list_pod_states(context, pod_state_filter)
+            if len(pod_states) == 0:
+                # the pod state record doesn't exist in db, then insert it
+                hypervisor_stat['pod_id'] = pod['pod_id']
+                hypervisor_stat['pod_state_id'] = uuidutils.generate_uuid()
+                db_api.create_pod_state(context, hypervisor_stat)
+            elif len(pod_states) == 1:
+                # the pod state record already exists, we should update it
+                db_api.update_pod_state(context, pod_states[0]['pod_state_id'],
+                                        hypervisor_stat)
+            else:
+                # the same pod usage info was collected more than once: this
+                # shouldn't happen
+                LOG.exception(
+                    _LE("Error: duplicate pod %(pod_id)s in pod state table"),
+                    {'pod_id': pod['pod_id']})
+
+    def pod_is_under_maintenance(self, context):
+        """Update one attribute named 'is_under_maintenance' in pod table
+
+        Pull pod usage information from cascaded pod by nova client.
+        According to this information we will update the pod state
+        in our own db. If all nova-compute services in one pod are
+        down or the hypervisor itself is disabled, then this pod is under
+        maintenance.
+
+        :param context: wsgi request object
+        :return: return nothing, update the pod attribute in db is enough
+        """
+
+        pods = db_api.list_pods(context)
+        for pod in pods:
+            if not pod['az_name']:
+                continue
+            client = self._get_client(pod['pod_name'])
+            is_under_maintenance = False
+            hypervisors = client.list_hypervisors(context)
+            for hv in hypervisors:
+                if hv['status'] == 'disabled' or hv['state'] == 'down':
+                    is_under_maintenance = True
+                    break
+            pod_update_dict = {'is_under_maintenance': is_under_maintenance}
+            try:
+                db_api.update_pod(context, pod['pod_id'], pod_update_dict)
+            except Exception:
+                message = _('Update Pod.is_under_maintenance %(pod_id)s fails'
+                            ) % {'pod_id': pod['pod_id']}
+                LOG.error(message)
 
     @staticmethod
     def _construct_brief_server_entry(server):
@@ -113,9 +189,27 @@ class ServerController(rest.RestController):
             return utils.format_nova_error(
                 400, _('server is not set'))
 
-        az = kw['server'].get('availability_zone', '')
+        # update the pod usage information in the database. Also, the
+        # Pod.is_under_maintenance attribute should be updated to exclude
+        # out-of-service pods
+        self.pod_state_statistics(context)
+        self.pod_is_under_maintenance(context)
+
+        az = kw['server'].get('availability_zone', None)
+        spec_obj = request_spec.RequestSpec(self.project_id,
+                                            az_name=az)
         pod, b_az = self.filter_scheduler.select_destination(
-            context, az, self.project_id, pod_group='')
+            context, spec_obj)
+
+        # filters = [{'key': 'pod_name',
+        #             'comparator': 'eq',
+        #             'value': 'Pod1'}]
+        # pods = db_api.list_pods(context, filters)
+        # if len(pods) == 0:
+        #     return utils.format_nova_error(
+        #         500, _('Pod1 nod found'))
+        # pod = pods[0]
+        # b_az = pod['az_name']
 
         if not pod:
             return utils.format_nova_error(
@@ -146,7 +240,6 @@ class ServerController(rest.RestController):
                 elif 'port' in net_info:
                     nic = {'port-id': net_info['port']}
                     server_body['networks'].append(nic)
-
         client = self._get_client(pod['pod_name'])
         server = client.create_servers(
             context,
