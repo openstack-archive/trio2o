@@ -58,7 +58,7 @@ class ServerController(rest.RestController):
     def _get_all(self, context, params):
         filters = [{'key': key,
                     'comparator': 'eq',
-                    'value': value} for key, value in params.iteritems()]
+                    'value': value} for key, value in six.iteritems(params)]
         ret = []
         pods = db_api.list_pods(context)
         for pod in pods:

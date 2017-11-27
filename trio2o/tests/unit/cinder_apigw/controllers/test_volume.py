@@ -39,7 +39,7 @@ class VolumeTypeTest(unittest.TestCase):
         self.controller = volume_type.VolumeTypeController(self.project_id)
 
     def _validate_error_code(self, res, code):
-        self.assertEqual(code, res[res.keys()[0]]['code'])
+        self.assertEqual(code, res[list(res.keys())[0]]['code'])
 
     @patch.object(pecan, 'response', new=FakeResponse)
     @patch.object(context, 'extract_context_from_environ')

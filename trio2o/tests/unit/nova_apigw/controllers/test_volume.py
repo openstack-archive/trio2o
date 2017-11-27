@@ -16,6 +16,7 @@
 import mock
 from mock import patch
 import pecan
+from six.moves import xrange
 import unittest
 
 from oslo_utils import uuidutils
@@ -68,7 +69,7 @@ class VolumeTest(unittest.TestCase):
         return t_pod, b_pods
 
     def _validate_error_code(self, res, code):
-        self.assertEqual(code, res[res.keys()[0]]['code'])
+        self.assertEqual(code, res[list(res.keys())[0]]['code'])
 
     @patch.object(pecan, 'response', new=FakeResponse)
     @patch.object(client.Client, 'action_resources')

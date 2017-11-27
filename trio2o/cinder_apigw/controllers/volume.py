@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import urlparse
+from six.moves.urllib import parse as urlparse
 
 from pecan import expose
 from pecan import request

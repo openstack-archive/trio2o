@@ -15,6 +15,8 @@
 
 import datetime
 from mock import patch
+import six
+from six.moves import xrange
 import unittest
 
 from oslo_config import cfg
@@ -118,7 +120,7 @@ class XManagerTest(unittest.TestCase):
         jobs = core.query_resource(self.context, models.Job, [], [])
         expected_status = [constants.JS_New, constants.JS_Success]
         job_status = [job['status'] for job in jobs]
-        self.assertItemsEqual(expected_status, job_status)
+        six.assertCountEqual(self, expected_status, job_status)
 
         self.assertEqual(fake_id, jobs[0]['resource_id'])
         self.assertEqual(fake_id, jobs[1]['resource_id'])
@@ -137,7 +139,7 @@ class XManagerTest(unittest.TestCase):
         jobs = core.query_resource(self.context, models.Job, [], [])
         expected_status = [constants.JS_New, constants.JS_Fail]
         job_status = [job['status'] for job in jobs]
-        self.assertItemsEqual(expected_status, job_status)
+        six.assertCountEqual(self, expected_status, job_status)
 
         self.assertEqual(fake_id, jobs[0]['resource_id'])
         self.assertEqual(fake_id, jobs[1]['resource_id'])
@@ -165,7 +167,7 @@ class XManagerTest(unittest.TestCase):
         jobs = core.query_resource(self.context, models.Job, [], [])
         expected_status = ['New', 'Fail', 'Success']
         job_status = [job['status'] for job in jobs]
-        self.assertItemsEqual(expected_status, job_status)
+        six.assertCountEqual(self, expected_status, job_status)
 
         for i in xrange(3):
             self.assertEqual(fake_id, jobs[i]['resource_id'])
@@ -222,7 +224,7 @@ class XManagerTest(unittest.TestCase):
         expected_ids = ['job_uuid3', 'job_uuid5']
         returned_jobs = db_api.get_latest_failed_jobs(self.context)
         actual_ids = [job['id'] for job in returned_jobs]
-        self.assertItemsEqual(expected_ids, actual_ids)
+        six.assertCountEqual(self, expected_ids, actual_ids)
 
     def tearDown(self):
         core.ModelBase.metadata.drop_all(core.get_engine())

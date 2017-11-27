@@ -225,7 +225,7 @@ class QuotaController(rest.RestController):
                 quotas = qs.show_detail_quota(context, show_usage=True)
 
                 # remove the allocated field which is not visible in Nova
-                for k, v in quotas['quota_set'].iteritems():
+                for k, v in six.iteritems(quotas['quota_set']):
                     if k != 'id':
                         v.pop('allocated', None)
 
@@ -262,7 +262,7 @@ class QuotaController(rest.RestController):
 
         ret = {}
         # only return Nova visible quota items
-        for k, v in quota_set.iteritems():
+        for k, v in six.iteritems(quota_set):
             if k in quota_map:
                 ret[k] = v
 
