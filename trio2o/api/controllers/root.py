@@ -19,6 +19,7 @@ import pecan
 from pecan import request
 
 from trio2o.api.controllers import pod
+from trio2o.api.controllers import pod_affinity_tag
 import trio2o.common.context as t_context
 
 
@@ -77,7 +78,8 @@ class V1Controller(object):
 
         self.sub_controllers = {
             "pods": pod.PodsController(),
-            "bindings": pod.BindingsController()
+            "bindings": pod.BindingsController(),
+            "pod-affinity-tag": pod_affinity_tag.PodAffinityTagController()
         }
 
         for name, ctrl in self.sub_controllers.items():
