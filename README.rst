@@ -18,7 +18,7 @@ The Trio2o acts as OpenStack API gateway, can handle OpenStack API calls,
 schedule one proper OpenStack instance if needed during the API calls handling,
 forward the API calls to the appropriate OpenStack instance.
 
-The end user can see avaialbility zone(AZ) and use AZ to provision
+The end user can see availability zone(AZ) and use AZ to provision
 VM, Volume, through the Trio2o. One AZ can include many OpenStack instances,
 the Trio2o can schedule and bind OpenStack instance for the tenant inside one
 AZ. A tenant's resources could be bound to multiple specific bottom OpenStack
