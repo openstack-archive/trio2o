@@ -31,7 +31,7 @@ TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_backup.VolumesBackup
 # TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_type"
 TESTCASES="$TESTCASES)"
 
-ostestr --regex $TESTCASES
+#ostestr --regex $TESTCASES
 
 # --------------------- IMPORTANT begin -------------------- #
 # all following test cases are from Cinder tempest test cases,
