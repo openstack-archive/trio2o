@@ -48,7 +48,7 @@ TESTCASES="$TESTCASES|tempest.api.compute.admin.test_servers_negative.ServersAdm
 TESTCASES="$TESTCASES|tempest.api.compute.admin.test_servers_negative.ServersAdminNegativeTestJSON.test_reset_state_server_nonexistent_server"
 TESTCASES="$TESTCASES)"
 
-ostestr --regex $TESTCASES
+#ostestr --regex $TESTCASES
 
 # --------------------- IMPORTANT begin -------------------- #
 # all following test cases are from Cinder tempest test cases,
