@@ -212,7 +212,8 @@ class NovaResourceHandle(ResourceHandle):
     support_resource = {'flavor': LIST,
                         'server': LIST | CREATE | DELETE | GET | ACTION,
                         'aggregate': LIST | CREATE | DELETE | ACTION,
-                        'server_volume': ACTION}
+                        'server_volume': ACTION,
+                        'os-services': LIST}
 
     def _get_client(self, cxt):
         url = self.endpoint_url.replace('$(tenant_id)s', cxt.tenant)
