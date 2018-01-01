@@ -19,12 +19,12 @@ import inspect
 import six
 import uuid
 
-from keystoneclient.auth.identity import v3 as auth_identity
-from keystoneclient.auth import token_endpoint
-from keystoneclient import session
+from keystoneauth1.identity import v3 as auth_identity
+from keystoneauth1 import session
 from keystoneclient.v3 import client as keystone_client
 from oslo_config import cfg
 from oslo_log import log as logging
+from oslo_utils import uuidutils
 
 import trio2o.common.context as trio2o_context
 from trio2o.common import exceptions
@@ -41,7 +41,7 @@ client_opts = [
                default='http://127.0.0.1/identity/v3',
                help='keystone service url'),
     cfg.BoolOpt('auto_refresh_endpoint',
-                default=False,
+                default=True,
                 help='if set to True, endpoint will be automatically'
                      'refreshed if timeout accessing endpoint'),
     cfg.StrOpt('top_pod_name',
@@ -203,7 +203,7 @@ class Client(object):
         return self._get_keystone_session().get_project_id()
 
     def _get_endpoint_from_keystone(self, cxt):
-        auth = token_endpoint.Token(cfg.CONF.client.identity_url,
+        auth = auth_identity.Token(cfg.CONF.client.identity_url,
                                     cxt.auth_token)
         sess = session.Session(auth=auth)
         cli = keystone_client.Client(session=sess)
@@ -246,6 +246,15 @@ class Client(object):
                             'comparator': 'eq',
                             'value': self.pod_name}]
             pod_list = api.list_pods(cxt, pod_filters)
+            if len(pod_list) == 0 and self.pod_name == 'RegionOne':
+                kw = {'pod_name': 'RegionOne',
+                      'az_name': '',
+                      'pod_id': uuidutils.generate_uuid(),
+                      'pod_az_name': '',
+                      'dc_name': '',
+                      }
+                api.create_pod(cxt, kw)
+                pod_list = api.list_pods(cxt, pod_filters)
             if len(pod_list) == 0:
                 raise exceptions.ResourceNotFound(models.Pod,
                                                   self.pod_name)

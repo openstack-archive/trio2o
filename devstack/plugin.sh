@@ -116,6 +116,7 @@ function init_common_trio2o_conf {
     iniset $conf_file DEFAULT verbose True
     iniset $conf_file DEFAULT use_syslog $SYSLOG
     iniset $conf_file DEFAULT trio2o_db_connection `database_connection_url trio2o`
+    iniset $conf_file DEFAULT transport_url rabbit://stackrabbit:password@127.0.0.1:5672/
 
     iniset $conf_file client auth_url http://$KEYSTONE_SERVICE_HOST/identity
     iniset $conf_file client identity_url http://$KEYSTONE_SERVICE_HOST/identity/v3
