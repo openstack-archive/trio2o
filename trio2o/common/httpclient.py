@@ -37,9 +37,18 @@ LOG = logging.getLogger(__name__)
 def get_version_from_url(url):
 
     components = urlparse.urlsplit(url)
-
+    port = components.port
     path = components.path
     pos = path.find('/')
+
+    if components.netloc == 'localhost':
+        port = "skip_port"
+
+    if not port:
+        path = path[pos+1:]
+        pos = path.find('/')
+        path = path[pos:]
+        pos = path.find('/')
 
     ver = ''
     if pos == 0:
@@ -92,7 +101,17 @@ def get_bottom_url(t_ver, t_url, b_ver, b_endpoint):
 
     scheme = b_parse.scheme
     netloc = b_parse.netloc
-    path = '/' + b_ver + '/' + after_ver
+    port = b_parse.port
+    if not port:
+        path = b_parse.path
+        pos_1 = path.find('/')
+
+        path = path[pos_1 + 1:]
+        pos_2 = path.find('/')
+        uri = path[pos_1:pos_2]
+        path = '/' + uri + '/' + b_ver + '/' + after_ver
+    else:
+        path = '/' + b_ver + '/' + after_ver
     if b_ver == '':
         path = '/' + after_ver
 
