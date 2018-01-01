@@ -212,7 +212,8 @@ class NovaResourceHandle(ResourceHandle):
     support_resource = {'flavor': LIST,
                         'server': LIST | CREATE | DELETE | GET | ACTION,
                         'aggregate': LIST | CREATE | DELETE | ACTION,
-                        'server_volume': ACTION}
+                        'server_volume': ACTION,
+                        'service': LIST}
 
     def _get_client(self, cxt):
         url = self.endpoint_url.replace('$(tenant_id)s', cxt.tenant)
@@ -228,6 +229,8 @@ class NovaResourceHandle(ResourceHandle):
     def _adapt_resource(self, resource):
         if resource == 'server_volume':
             return 'volume'
+        # elif resource == 'os-services':
+        #     return 'service'
         else:
             return resource
 
@@ -237,7 +240,7 @@ class NovaResourceHandle(ResourceHandle):
             client = self._get_client(cxt)
             collection = '%ss' % resource
             # only server list supports filter
-            if resource == 'server':
+            if resource == 'server' or resource == 'service':
                 search_opts = _transform_filters(filters)
                 return [res.to_dict() for res in getattr(
                     client, collection).list(search_opts=search_opts)]
