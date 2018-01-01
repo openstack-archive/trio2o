@@ -33,6 +33,7 @@ from trio2o.nova_apigw.controllers import image
 from trio2o.nova_apigw.controllers import network
 from trio2o.nova_apigw.controllers import quota_sets
 from trio2o.nova_apigw.controllers import server
+from trio2o.nova_apigw.controllers import service
 from trio2o.nova_apigw.controllers import volume
 
 
@@ -64,6 +65,7 @@ class V21Controller(object):
         self.resource_controller = {
             'flavors': flavor.FlavorController,
             'os-aggregates': aggregate.AggregateController,
+            'os-services': service.ServiceController,
             'servers': server.ServerController,
             'images': image.ImageController,
             'os-quota-sets': quota_sets.QuotaSetsController,
