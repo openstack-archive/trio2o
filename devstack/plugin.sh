@@ -30,7 +30,7 @@ function create_trio2o_accounts {
 }
 
 # create_nova_apigw_accounts() - Set up common required nova_apigw
-# work as nova api serice
+# work as nova api service
 # service accounts in keystone
 # Project               User            Roles
 # -----------------------------------------------------------------
@@ -116,6 +116,7 @@ function init_common_trio2o_conf {
     iniset $conf_file DEFAULT verbose True
     iniset $conf_file DEFAULT use_syslog $SYSLOG
     iniset $conf_file DEFAULT trio2o_db_connection `database_connection_url trio2o`
+    iniset $conf_file DEFAULT transport_url $(get_notification_url)
 
     iniset $conf_file client auth_url http://$KEYSTONE_SERVICE_HOST/identity
     iniset $conf_file client identity_url http://$KEYSTONE_SERVICE_HOST/identity/v3
