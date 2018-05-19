@@ -233,7 +233,6 @@ ostestr --regex $TESTCASES
 # tempest.api.compute.admin.test_servers_on_multinodes.ServersOnMultiNodesTest.test_create_servers_on_different_hosts_with_list_of_servers[id-7869cc84-d661-4e14-9f00-c18cdc89cf57]
 # tempest.api.compute.admin.test_servers_on_multinodes.ServersOnMultiNodesTest.test_create_servers_on_same_host[id-26a9d5df-6890-45f2-abc4-a659290cb130]
 # tempest.api.compute.admin.test_services.ServicesAdminTestJSON.test_get_service_by_host_name[id-affb42d5-5b4b-43c8-8b0b-6dca054abcca]
-# tempest.api.compute.admin.test_services.ServicesAdminTestJSON.test_get_service_by_service_and_host_name[id-39397f6f-37b8-4234-8671-281e44c74025]
 # tempest.api.compute.admin.test_services.ServicesAdminTestJSON.test_get_service_by_service_binary_name[id-f345b1ec-bc6e-4c38-a527-3ca2bc00bef5]
 # tempest.api.compute.admin.test_services.ServicesAdminTestJSON.test_list_services[id-5be41ef4-53d1-41cc-8839-5c2a48a1b283]
 # tempest.api.compute.admin.test_services_negative.ServicesAdminNegativeTestJSON.test_get_service_by_invalid_params[id-d0884a69-f693-4e79-a9af-232d15643bf7,negative]
