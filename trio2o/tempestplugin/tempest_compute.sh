@@ -344,7 +344,7 @@ ostestr --regex $TESTCASES
 # tempest.api.compute.keypairs.test_keypairs_v22.KeyPairsV22TestJSON.test_keypairsv22_create_list_show[id-8726fa85-7f98-4b20-af9e-f710a4f3391c]
 # tempest.api.compute.keypairs.test_keypairs_v22.KeyPairsV22TestJSON.test_keypairsv22_create_list_show_with_type[id-89d59d43-f735-441a-abcf-0601727f47b6]
 # tempest.api.compute.limits.test_absolute_limits.AbsoluteLimitsTestJSON.test_absLimits_get[id-b54c66af-6ab6-4cf0-a9e5-a0cb58d75e0b]
-# tempest.api.compute.limits.test_absolute_limits_negative.AbsoluteLimitsNegativeTestJSON.test_max_image_meta_exceed_limit[id-215cd465-d8ae-49c9-bf33-9c911913a5c8,negative]
+# tempest.api.compute.limits.test_absolute_limits_negative.AbsoluteLimitsNegativeTestJSON.test_max_metadata_exceed_limit[id-215cd465-d8ae-49c9-bf33-9c911913a5c8,negative]
 # tempest.api.compute.security_groups.test_security_group_rules.SecurityGroupRulesTestJSON.test_security_group_rules_create[id-850795d7-d4d3-4e55-b527-a774c0123d3a,network,smoke]
 # tempest.api.compute.security_groups.test_security_group_rules.SecurityGroupRulesTestJSON.test_security_group_rules_create_with_optional_cidr[id-7a01873e-3c38-4f30-80be-31a043cfe2fd,network]
 # tempest.api.compute.security_groups.test_security_group_rules.SecurityGroupRulesTestJSON.test_security_group_rules_create_with_optional_group_id[id-7f5d2899-7705-4d4b-8458-4505188ffab6,network]
