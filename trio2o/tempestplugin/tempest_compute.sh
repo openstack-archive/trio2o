@@ -373,7 +373,7 @@ ostestr --regex $TESTCASES
 # tempest.api.compute.security_groups.test_security_groups_negative.SecurityGroupsNegativeTestJSON.test_update_security_group_with_invalid_sg_des[id-97d12b1c-a610-4194-93f1-ba859e718b45,negative,network]
 # tempest.api.compute.security_groups.test_security_groups_negative.SecurityGroupsNegativeTestJSON.test_update_security_group_with_invalid_sg_id[id-00579617-fe04-4e1c-9d08-ca7467d2e34b,negative,network]
 # tempest.api.compute.security_groups.test_security_groups_negative.SecurityGroupsNegativeTestJSON.test_update_security_group_with_invalid_sg_name[id-cda8d8b4-59f8-4087-821d-20cf5a03b3b1,negative,network]
-# tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestJSON.test_add_remove_fixed_ip[id-c7e0e60b-ee45-43d0-abeb-8596fd42a2f9,network,smoke]
+# tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestV243.test_add_remove_fixed_ip[id-c7e0e60b-ee45-43d0-abeb-8596fd42a2f9,network,smoke]
 # tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestJSON.test_create_list_show_delete_interfaces[id-73fe8f02-590d-4bf1-b184-e9ca81065051,network]
 # tempest.api.compute.servers.test_availability_zone.AZV2TestJSON.test_get_availability_zone_list_with_non_admin_user[id-a8333aa2-205c-449f-a828-d38c2489bf25]
 # tempest.api.compute.servers.test_create_server.ServersTestJSON.test_create_server_with_scheduler_hint_group[id-ed20d3fb-9d1f-4329-b160-543fbd5d9811]
