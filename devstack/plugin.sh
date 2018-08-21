@@ -126,6 +126,7 @@ function init_common_trio2o_conf {
     iniset $conf_file client top_pod_name $REGION_NAME
 
     iniset $conf_file oslo_concurrency lock_path $TRIO2O_STATE_PATH/lock
+    iniset_rpc_backend trio2o $conf_file
 }
 
 function configure_trio2o_api {
