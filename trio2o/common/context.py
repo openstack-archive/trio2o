@@ -57,7 +57,7 @@ def extract_context_from_environ():
         context_paras[key] = environ.get(context_paras[key])
     role = environ.get('HTTP_X_ROLE')
 
-    context_paras['is_admin'] = role == 'admin'
+    context_paras['is_admin'] = 'admin' in role.split(',')
     return Context(**context_paras)
 
 
