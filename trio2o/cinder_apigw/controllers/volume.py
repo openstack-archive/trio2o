@@ -71,8 +71,8 @@ class VolumeController(rest.RestController):
         # to convert the content
         # b_release = pod['release']
         # t_release = t_pod['release']
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.R_QUEENS
+        b_release = cons.R_QUEENS
 
         s_ctx = hclient.get_pod_service_ctx(
             context,
@@ -161,8 +161,8 @@ class VolumeController(rest.RestController):
             return self._get_all(context)
 
         # TODO(joehuang): get the release of top and bottom
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.R_QUEENS
+        b_release = cons.R_QUEENS
 
         b_headers = hclient.convert_header(t_release,
                                            b_release,
@@ -253,8 +253,8 @@ class VolumeController(rest.RestController):
                 continue
 
             # TODO(joehuang): get the release of top and bottom
-            t_release = cons.R_MITAKA
-            b_release = cons.R_MITAKA
+            t_release = cons.R_QUEENS
+            b_release = cons.R_QUEENS
             b_headers = hclient.convert_header(t_release,
                                                b_release,
                                                request.headers)
@@ -298,8 +298,8 @@ class VolumeController(rest.RestController):
         # top and bottom API server, also, _convert_header and _convert_object
         # will do the real job to convert the request header and body
         # according to the API versions.
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.R_QUEENS
+        b_release = cons.R_QUEENS
 
         s_ctx = hclient.get_res_routing_ref(context, _id, request.url,
                                             cons.ST_CINDER)
@@ -362,8 +362,8 @@ class VolumeController(rest.RestController):
         context = t_context.extract_context_from_environ()
 
         # TODO(joehuang): get the release of top and bottom
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.R_QUEENS
+        b_release = cons.R_QUEENS
 
         s_ctx = hclient.get_res_routing_ref(context, _id, request.url,
                                             cons.ST_CINDER)

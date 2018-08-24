@@ -35,22 +35,25 @@ LOG = logging.getLogger(__name__)
 # or url sent to trio2o service, which is stored in
 # pecan.request.url
 def get_version_from_url(url):
+    import re
+
+    def _split_ver(m, path, pos):
+        return path[pos:m.start() + len(m.group())] if m else path
+
+    # find similar versions: v3 or v3.1
+    p = re.compile('v\d+\.?\d*')
 
     components = urlparse.urlsplit(url)
 
     path = components.path
     pos = path.find('/')
+    m = p.search(path)
 
     ver = ''
     if pos == 0:
-        path = path[1:]
-        i = path.find('/')
-        if i >= 0:
-            ver = path[:i]
-        else:
-            ver = path
+        ver = _split_ver(m, path, 1)
     elif pos > 0:
-        ver = path[:pos]
+        ver = _split_ver(m, path, 0)
     else:
         ver = path
 
