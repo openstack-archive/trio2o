@@ -18,8 +18,8 @@ import datetime
 
 # service type
 ST_NOVA = 'nova'
-# only support cinder v2
-ST_CINDER = 'cinderv2'
+# only support cinder v3
+ST_CINDER = 'cinderv3'
 ST_NEUTRON = 'neutron'
 ST_GLANCE = 'glance'
 
@@ -37,12 +37,19 @@ RT_SG = 'security_group'
 
 # version list
 NOVA_VERSION_V21 = 'v2.1'
-CINDER_VERSION_V2 = 'v2'
+CINDER_VERSION_V3 = 'v3'
 NEUTRON_VERSION_V2 = 'v2'
 
 # supported release
 R_LIBERTY = 'liberty'
 R_MITAKA = 'mitaka'
+R_QUEENS = 'queens'
+R_STEIN = 'stein'
+R_LATEST = 'latest'
+
+# top and bottom release
+T_RELEASE = R_LATEST
+B_RELEASE = R_LATEST
 
 # l3 bridge networking elements
 ew_bridge_subnet_pool_name = 'ew_bridge_subnet_pool'

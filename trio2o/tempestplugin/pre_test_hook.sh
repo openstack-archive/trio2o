@@ -19,3 +19,5 @@ export TRIO2O_API_CONF=/etc/trio2o/api.conf
 export TRIO2O_CINDER_APIGW_CONF=/etc/trio2o/cinder_apigw.conf
 export TRIO2O_NOVA_APIGW_CONF=/etc/trio2o/nova_apigw.conf
 export TRIO2O_XJOB_CONF=/etc/trio2o/xjob.conf
+export NOVA_SERVICE_PORT=80
+export CINDER_SERVICE_PORT=80

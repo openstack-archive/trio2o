@@ -144,7 +144,7 @@ class MicroVersionFunctionTest(base.TestCase):
             'service_id': 'fake_service_id' + '2',
             'pod_id': 'fake_pod_id' + '2',
             'service_type': cons.ST_CINDER,
-            'service_url': 'http://10.0.0.2:8774/v2/$(tenant_id)s'
+            'service_url': 'http://10.0.0.2:8774/v3/$(tenant_id)s'
         }
 
         top_pod = {

@@ -3,7 +3,7 @@
 # Test if any trio2o services are enabled
 # is_trio2o_enabled
 function is_trio2o_enabled {
-    [[ ,${ENABLED_SERVICES} =~ ,"t-api" ]] && return 0
+    [[ ,${ENABLED_SERVICES} =~ ,"t-oapi" ]] && return 0
     return 1
 }
 
@@ -14,7 +14,7 @@ function is_trio2o_enabled {
 # $SERVICE_TENANT_NAME  trio2o          service
 
 function create_trio2o_accounts {
-    if [[ "$ENABLED_SERVICES" =~ "t-api" ]]; then
+    if [[ "$ENABLED_SERVICES" =~ "t-oapi" ]]; then
         create_service_user "trio2o"
 
         if [[ "$KEYSTONE_CATALOG_BACKEND" = 'sql' ]]; then
@@ -65,15 +65,15 @@ function create_cinder_apigw_accounts {
         create_service_user "cinder_apigw"
 
         local trio2o_cinder_apigw=$(get_or_create_service "cinder" \
-            "volumev2" "Cinder Volume Service")
+            "volumev3" "Cinder Volume Service")
 
         remove_old_endpoint_conf $trio2o_cinder_apigw
 
         get_or_create_endpoint $trio2o_cinder_apigw \
             "$REGION_NAME" \
-            "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v2/"'$(tenant_id)s' \
-            "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v2/"'$(tenant_id)s' \
-            "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v2/"'$(tenant_id)s'
+            "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v3/"'$(tenant_id)s' \
+            "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v3/"'$(tenant_id)s' \
+            "$SERVICE_PROTOCOL://$TRIO2O_CINDER_APIGW_HOST:$TRIO2O_CINDER_APIGW_PORT/v3/"'$(tenant_id)s'
     fi
 }
 
@@ -126,11 +126,12 @@ function init_common_trio2o_conf {
     iniset $conf_file client top_pod_name $REGION_NAME
 
     iniset $conf_file oslo_concurrency lock_path $TRIO2O_STATE_PATH/lock
+    iniset_rpc_backend trio2o $conf_file
 }
 
 function configure_trio2o_api {
 
-    if is_service_enabled t-api ; then
+    if is_service_enabled t-oapi ; then
         echo "Configuring Trio2o API"
 
         init_common_trio2o_conf $TRIO2O_API_CONF
@@ -262,7 +263,7 @@ function cleanup_trio2o_api_wsgi {
 }
 
 function configure_trio2o_xjob {
-    if is_service_enabled t-job ; then
+    if is_service_enabled t-ojob ; then
         echo "Configuring Trio2o xjob"
 
         init_common_trio2o_conf $TRIO2O_XJOB_CONF
@@ -284,9 +285,9 @@ function reconfigure_nova {
 
     get_or_create_endpoint "compute" \
         "$POD_REGION_NAME" \
-        "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
-        "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
-        "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s'
+        "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/compute/v2.1" \
+        "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/compute/v2.1" \
+        "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/compute/v2.1"
 
     stop_process n-api
     stop_process n-cpu
@@ -333,7 +334,7 @@ elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
 
     sudo install -d -o $STACK_USER -m 755 $TRIO2O_CONF_DIR
 
-    enable_service t-api t-job t-ngw t-cgw
+    enable_service t-oapi t-ojob t-ngw t-cgw
 
     configure_trio2o_api
     configure_trio2o_nova_apigw
@@ -361,14 +362,14 @@ elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
         TRIO2O_BIN_DIR=$(get_python_exec_prefix)
     fi
 
-    if is_service_enabled t-api; then
+    if is_service_enabled t-oapi; then
 
         create_trio2o_accounts
 
         if [[ "$TRIO2O_DEPLOY_WITH_WSGI" == "True" ]]; then
             start_trio2o_api_wsgi
         else
-            run_process t-api "$TRIO2O_BIN_DIR/trio2o-api --config-file $TRIO2O_API_CONF"
+            run_process t-oapi "$TRIO2O_BIN_DIR/trio2o-api --config-file $TRIO2O_API_CONF"
         fi
     fi
 
@@ -380,9 +381,19 @@ elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
 
         get_or_create_endpoint "compute" \
             "$POD_REGION_NAME" \
-            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
-            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s' \
-            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/v2.1/"'$(tenant_id)s'
+            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/compute/v2.1" \
+            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/compute/v2.1" \
+            "$NOVA_SERVICE_PROTOCOL://$NOVA_SERVICE_HOST:$NOVA_SERVICE_PORT/compute/v2.1"
+
+        token=$(openstack --os-cloud devstack-admin --os-region-name=RegionOne token issue -c id -f value)
+
+        data='{"pod": {"pod_name":  '\"$REGION_NAME\"'}}'
+        curl -X POST http://$TRIO2O_NOVA_APIGW_HOST:$TRIO2O_API_PORT/v1.0/pods -H "Content-Type: application/json" \
+            -H "X-Auth-Token: $token" -d "$data"
+
+	    data='{"pod": {"pod_name":  '\"$POD_REGION_NAME\"', "az_name": "az1"}}'
+        curl -X POST http://$TRIO2O_NOVA_APIGW_HOST:$TRIO2O_API_PORT/v1.0/pods -H "Content-Type: application/json" \
+            -H "X-Auth-Token: $token" -d "$data"
     fi
 
     if is_service_enabled t-cgw; then
@@ -391,27 +402,27 @@ elif [[ "$1" == "stack" && "$2" == "extra" ]]; then
 
         run_process t-cgw "$TRIO2O_BIN_DIR/trio2o-cinder-apigw --config-file $TRIO2O_CINDER_APIGW_CONF"
 
-        get_or_create_endpoint "volumev2" \
+        get_or_create_endpoint "volumev3" \
             "$POD_REGION_NAME" \
-            "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s' \
-            "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s' \
-            "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/v2/"'$(tenant_id)s'
+            "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/volume/v3/"'$(tenant_id)s' \
+            "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/volume/v3/"'$(tenant_id)s' \
+            "$CINDER_SERVICE_PROTOCOL://$CINDER_SERVICE_HOST:$CINDER_SERVICE_PORT/volume/v3/"'$(tenant_id)s'
     fi
 
-    if is_service_enabled t-job; then
+    if is_service_enabled t-ojob; then
 
-        run_process t-job "$TRIO2O_BIN_DIR/trio2o-xjob --config-file $TRIO2O_XJOB_CONF"
+        run_process t-ojob "$TRIO2O_BIN_DIR/trio2o-xjob --config-file $TRIO2O_XJOB_CONF"
     fi
 fi
 
 if [[ "$1" == "unstack" ]]; then
 
-    if is_service_enabled t-api; then
+    if is_service_enabled t-oapi; then
        if [[ "$TRIO2O_DEPLOY_WITH_WSGI" == "True" ]]; then
             stop_trio2o_api_wsgi
             clean_trio2o_api_wsgi
         else
-            stop_process t-api
+            stop_process t-oapi
         fi
     fi
 
@@ -423,7 +434,7 @@ if [[ "$1" == "unstack" ]]; then
        stop_process t-cgw
     fi
 
-    if is_service_enabled t-job; then
-       stop_process t-job
+    if is_service_enabled t-ojob; then
+       stop_process t-ojob
     fi
 fi

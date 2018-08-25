@@ -30,7 +30,7 @@ class RootController(object):
 
     @pecan.expose()
     def _lookup(self, version, *remainder):
-        if version == 'v2':
+        if version == 'v3':
             return V2Controller(), remainder
 
     @pecan.expose(generic=True, template='json')
@@ -40,10 +40,10 @@ class RootController(object):
                 {
                     "status": "CURRENT",
                     "updated": "2012-11-21T11:33:21Z",
-                    "id": "v2.0",
+                    "id": "v3.0",
                     "links": [
                         {
-                            "href": pecan.request.application_url + "/v2/",
+                            "href": pecan.request.application_url + "/v3/",
                             "rel": "self"
                         }
                     ]
@@ -112,10 +112,10 @@ class V2Controller(object):
                         "type": self._media_type2
                     }
                 ],
-                "id": "v2.0",
+                "id": "v3.0",
                 "links": [
                     {
-                        "href": pecan.request.application_url + "/v2/",
+                        "href": pecan.request.application_url + "/v3/",
                         "rel": "self"
                     },
                     {

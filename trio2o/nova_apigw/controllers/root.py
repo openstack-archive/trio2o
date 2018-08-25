@@ -34,7 +34,8 @@ from trio2o.nova_apigw.controllers import network
 from trio2o.nova_apigw.controllers import quota_sets
 from trio2o.nova_apigw.controllers import server
 from trio2o.nova_apigw.controllers import volume
-
+from trio2o.nova_apigw.controllers import services
+from trio2o.nova_apigw.controllers import server_external_events
 
 LOG = logging.getLogger(__name__)
 
@@ -68,7 +69,10 @@ class V21Controller(object):
             'images': image.ImageController,
             'os-quota-sets': quota_sets.QuotaSetsController,
             'limits': quota_sets.LimitsController,
-            'os-networks': network.NetworkController
+            'os-networks': network.NetworkController,
+            'os-services': services.ServicesController,
+            'os-server-external-events':
+                server_external_events.ServerExternalEventController
         }
         self.server_sub_controller = {
             'os-volume_attachments': volume.VolumeController,

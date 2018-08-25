@@ -111,6 +111,7 @@ class VolumeBackupsTest(unittest.TestCase):
                            mock_forward_req, mock_loads):
         mock_context.return_value = self.context
         pecan.core.state = mock_request
+        mock_request.request.url = 'http://127.0.0.1/v3/my_tenant_id/backups'
         mock_forward_req.return_value = FakeResponse(200)
         fake_resp = {'fakeresp': 'fakeresp'}
         mock_loads.return_value = fake_resp
