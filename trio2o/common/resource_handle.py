@@ -210,7 +210,9 @@ def _convert_into_with_meta(item, resp):
 class NovaResourceHandle(ResourceHandle):
     service_type = cons.ST_NOVA
     support_resource = {'flavor': LIST,
+                        'service': LIST,
                         'server': LIST | CREATE | DELETE | GET | ACTION,
+                        'server_external_event': CREATE,
                         'aggregate': LIST | CREATE | DELETE | ACTION,
                         'server_volume': ACTION}
 
@@ -241,6 +243,11 @@ class NovaResourceHandle(ResourceHandle):
                 search_opts = _transform_filters(filters)
                 return [res.to_dict() for res in getattr(
                     client, collection).list(search_opts=search_opts)]
+            elif resource == 'service':
+                filters = _transform_filters(filters)
+                return [res.to_dict() for res in getattr(
+                    client, collection).list(host=filters.get('host'),
+                                             binary=filters.get('binary'))]
             else:
                 return [res.to_dict() for res in getattr(client,
                                                          collection).list()]
@@ -254,8 +261,10 @@ class NovaResourceHandle(ResourceHandle):
             resource = self._adapt_resource(resource)
             client = self._get_client(cxt)
             collection = '%ss' % resource
-            return getattr(client, collection).create(
-                *args, **kwargs).to_dict()
+            result = getattr(client, collection).create(*args, **kwargs)
+            if resource in ('server_external_event', ):
+                return result
+            return result.to_dict()
         except r_exceptions.ConnectTimeout:
             self.endpoint_url = None
             raise exceptions.EndpointNotAvailable('nova',
