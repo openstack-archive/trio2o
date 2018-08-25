@@ -37,7 +37,7 @@ FAKE_SERVICE_ID_2 = 'fake_service_id_2'
 FAKE_TOP_NAME = 'RegionOne'
 FAKE_TOP_ID = 'fake_top_pod_id'
 FAKE_TOP_SERVICE_ID = 'fake_top_service_id'
-FAKE_TOP_ENDPOINT = 'http://127.0.0.1:8774/v2/$(tenant_id)s'
+FAKE_TOP_ENDPOINT = 'http://127.0.0.1:8774/v3/$(tenant_id)s'
 
 FAKE_TYPE = 'fake_type'
 FAKE_URL = 'http://127.0.0.1:12345'

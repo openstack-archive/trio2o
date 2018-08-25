@@ -76,7 +76,7 @@ class TestRootController(Cinder_API_GW_FunctionalTest):
         json_body = jsonutils.loads(response.body)
         versions = json_body.get('versions')
         self.assertEqual(1, len(versions))
-        self.assertEqual(versions[0]["id"], "v2.0")
+        self.assertEqual(versions[0]["id"], "v3.0")
 
     def _test_method_returns_405(self, method):
         api_method = getattr(self.app, method)
@@ -102,15 +102,15 @@ class TestRootController(Cinder_API_GW_FunctionalTest):
 class TestV2Controller(Cinder_API_GW_FunctionalTest):
 
     def test_get(self):
-        response = self.app.get('/v2/')
+        response = self.app.get('/v3/')
         self.assertEqual(response.status_int, 200)
         json_body = jsonutils.loads(response.body)
         version = json_body.get('version')
-        self.assertEqual(version["id"], "v2.0")
+        self.assertEqual(version["id"], "v3.0")
 
     def _test_method_returns_405(self, method):
         api_method = getattr(self.app, method)
-        response = api_method('/v2/', expect_errors=True)
+        response = api_method('/v3/', expect_errors=True)
         self.assertEqual(response.status_int, 405)
 
     def test_post(self):
@@ -136,7 +136,7 @@ class TestErrors(Cinder_API_GW_FunctionalTest):
         self.assertEqual(response.status_int, 404)
 
     def test_bad_method(self):
-        response = self.app.patch('/v2/123',
+        response = self.app.patch('/v3/123',
                                   expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
