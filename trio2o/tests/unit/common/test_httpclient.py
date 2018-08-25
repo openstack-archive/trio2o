@@ -81,7 +81,7 @@ class HttpClientTest(unittest.TestCase):
 
         url = 'https://127.0.0.1/sss/'
         ver = hclient.get_version_from_url(url)
-        self.assertEqual(ver, 'sss')
+        self.assertEqual(ver, 'sss/')
 
         url = ''
         ver = hclient.get_version_from_url(url)
@@ -89,11 +89,11 @@ class HttpClientTest(unittest.TestCase):
 
     def test_get_bottom_url(self):
         b_endpoint = 'http://127.0.0.1:8774/v2.1/$(tenant_id)s'
-        t_url = 'http://127.0.0.1:8774/v2/my_tenant_id/volumes'
+        t_url = 'http://127.0.0.1:8774/v3/my_tenant_id/volumes'
         t_ver = hclient.get_version_from_url(t_url)
         b_ver = hclient.get_version_from_url(b_endpoint)
 
-        self.assertEqual(t_ver, 'v2')
+        self.assertEqual(t_ver, 'v3')
         self.assertEqual(b_ver, 'v2.1')
 
         b_url = hclient.get_bottom_url(t_ver, t_url, b_ver, b_endpoint)
@@ -139,7 +139,7 @@ class HttpClientTest(unittest.TestCase):
             'service_type': cons.ST_CINDER,
             'service_url': 'http://127.0.0.1:8774/v2.1/$(tenant_id)s'
         }
-        t_url = 'http://127.0.0.1:8774/v2/my_tenant_id/volumes'
+        t_url = 'http://127.0.0.1:8774/v3/my_tenant_id/volumes'
         api.create_pod(self.context, pod_dict)
         api.create_pod_service_configuration(self.context, config_dict)
 
@@ -154,7 +154,7 @@ class HttpClientTest(unittest.TestCase):
                                             t_url,
                                             pod_dict['pod_name'],
                                             cons.ST_CINDER)
-        self.assertEqual(b_ctx['t_ver'], 'v2')
+        self.assertEqual(b_ctx['t_ver'], 'v3')
         self.assertEqual(b_ctx['t_url'], t_url)
         self.assertEqual(b_ctx['b_ver'], 'v2.1')
         self.assertEqual(b_ctx['b_url'], b_url)
@@ -164,7 +164,7 @@ class HttpClientTest(unittest.TestCase):
                                             t_url,
                                             pod_dict['pod_name'] + '1',
                                             cons.ST_CINDER)
-        self.assertEqual(b_ctx['t_ver'], 'v2')
+        self.assertEqual(b_ctx['t_ver'], 'v3')
         self.assertEqual(b_ctx['t_url'], t_url)
         self.assertEqual(b_ctx['b_ver'], '')
         self.assertEqual(b_ctx['b_url'], '')
@@ -174,7 +174,7 @@ class HttpClientTest(unittest.TestCase):
                                             t_url,
                                             pod_dict['pod_name'],
                                             cons.ST_CINDER + '1')
-        self.assertEqual(b_ctx['t_ver'], 'v2')
+        self.assertEqual(b_ctx['t_ver'], 'v3')
         self.assertEqual(b_ctx['t_url'], t_url)
         self.assertEqual(b_ctx['b_ver'], '')
         self.assertEqual(b_ctx['b_url'], '')
