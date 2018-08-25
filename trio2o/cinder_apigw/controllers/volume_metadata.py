@@ -74,8 +74,8 @@ class VolumeMetaDataController(rest.RestController):
                            'exception': e})
             return utils.format_cinder_error(500, _('Fail to create metadata'))
 
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.T_RELEASE
+        b_release = cons.B_RELEASE
 
         s_ctx = hclient.get_pod_service_ctx(
             context,
@@ -130,8 +130,8 @@ class VolumeMetaDataController(rest.RestController):
         """Get all metadata associated with a volume."""
         context = t_context.extract_context_from_environ()
 
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.T_RELEASE
+        b_release = cons.B_RELEASE
 
         b_headers = hclient.convert_header(t_release,
                                            b_release,
@@ -189,8 +189,8 @@ class VolumeMetaDataController(rest.RestController):
                 400, _("Missing required element 'metadata' in "
                        "request body."))
 
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.T_RELEASE
+        b_release = cons.B_RELEASE
 
         try:
             s_ctx = hclient.get_res_routing_ref(context, self.volume_id,
@@ -248,8 +248,8 @@ class VolumeMetaDataController(rest.RestController):
         """Delete the given metadata item from a volume."""
         context = t_context.extract_context_from_environ()
 
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.T_RELEASE
+        b_release = cons.B_RELEASE
 
         try:
             s_ctx = hclient.get_res_routing_ref(context, self.volume_id,
