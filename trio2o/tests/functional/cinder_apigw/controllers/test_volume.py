@@ -184,7 +184,7 @@ class CinderVolumeFunctionalTest(base.TestCase):
             'service_id': 'fake_service_id',
             'pod_id': 'fake_pod_id',
             'service_type': cons.ST_CINDER,
-            'service_url': 'http://127.0.0.1:8774/v2/$(tenant_id)s'
+            'service_url': 'http://127.0.0.1:8774/v3/$(tenant_id)s'
         }
 
         pod_dict2 = {
@@ -197,7 +197,7 @@ class CinderVolumeFunctionalTest(base.TestCase):
             'service_id': 'fake_service_id' + '2',
             'pod_id': 'fake_pod_id' + '2',
             'service_type': cons.ST_CINDER,
-            'service_url': 'http://10.0.0.2:8774/v2/$(tenant_id)s'
+            'service_url': 'http://10.0.0.2:8774/v3/$(tenant_id)s'
         }
 
         top_pod = {
@@ -210,7 +210,7 @@ class CinderVolumeFunctionalTest(base.TestCase):
             'service_id': 'fake_top_service_id',
             'pod_id': 'fake_top_pod_id',
             'service_type': cons.ST_CINDER,
-            'service_url': 'http://127.0.0.1:19998/v2/$(tenant_id)s'
+            'service_url': 'http://127.0.0.1:19998/v3/$(tenant_id)s'
         }
 
         db_api.create_pod(self.context, pod_dict)
@@ -431,7 +431,7 @@ class TestVolumeController(CinderVolumeFunctionalTest):
     @patch.object(hclient, 'forward_req',
                   new=fake_volumes_forward_req)
     def test_get(self):
-        response = self.app.get('/v2/my_tenant_id/volumes')
+        response = self.app.get('/v3/my_tenant_id/volumes')
         self.assertEqual(response.status_int, 200)
         json_body = jsonutils.loads(response.body)
         vols = json_body.get('volumes')
@@ -510,18 +510,18 @@ class TestVolumeController(CinderVolumeFunctionalTest):
         ]
         tenant_id = 'my_tenant_id'
         for volume in volumes:
-            self.app.post_json('/v2/' + tenant_id + '/volumes',
+            self.app.post_json('/v3/' + tenant_id + '/volumes',
                                dict(volume=volume['volume']),
                                expect_errors=True)
         query_string = '?availability_zone=' + FAKE_AZ
-        resp = self.app.get('/v2/' + tenant_id + '/volumes' + query_string)
+        resp = self.app.get('/v3/' + tenant_id + '/volumes' + query_string)
         self.assertEqual(resp.status_int, 200)
         json_body = jsonutils.loads(resp.body)
         ret_vols = json_body.get('volumes')
         self.assertEqual(len(ret_vols), 2)
 
         query_string = '?availability_zone=' + FAKE_AZ + '2'
-        resp = self.app.get('/v2/' + tenant_id + '/volumes' + query_string)
+        resp = self.app.get('/v3/' + tenant_id + '/volumes' + query_string)
         self.assertEqual(resp.status_int, 200)
         json_body = jsonutils.loads(resp.body)
         ret_vols = json_body.get('volumes')
@@ -551,14 +551,14 @@ class TestVolumeController(CinderVolumeFunctionalTest):
         }
 
         tenant_id = 'my_tenant_id'
-        resp = self.app.post_json('/v2/' + tenant_id + '/volumes',
+        resp = self.app.post_json('/v3/' + tenant_id + '/volumes',
                                   dict(volume=volume['volume']),
                                   expect_errors=True)
         volume_dict = jsonutils.loads(resp.body)
         volume_id = volume_dict['volume']['id']
 
         update_dict = {"volume": {"name": 'vol_2'}}
-        resp = self.app.put_json('/v2/' + tenant_id + '/volumes/' + volume_id,
+        resp = self.app.put_json('/v3/' + tenant_id + '/volumes/' + volume_id,
                                  dict(volume=update_dict['volume']),
                                  expect_errors=True)
         volume_dict = jsonutils.loads(resp.body)
@@ -569,12 +569,12 @@ class TestVolumeController(CinderVolumeFunctionalTest):
         for test_vol in volumes:
             if test_vol.get('volume'):
                 response = self.app.post_json(
-                    '/v2/' + tenant_id + '/volumes',
+                    '/v3/' + tenant_id + '/volumes',
                     dict(volume=test_vol['volume']),
                     expect_errors=True)
             elif test_vol.get('volume_xxx'):
                 response = self.app.post_json(
-                    '/v2/' + tenant_id + '/volumes',
+                    '/v3/' + tenant_id + '/volumes',
                     dict(volume_xxx=test_vol['volume_xxx']),
                     expect_errors=True)
             else:
@@ -587,7 +587,7 @@ class TestVolumeController(CinderVolumeFunctionalTest):
                 json_body = jsonutils.loads(response.body)
                 res_vol = json_body.get('volume')
                 query_resp = self.app.get(
-                    '/v2/' + tenant_id + '/volumes/' + res_vol['id'])
+                    '/v3/' + tenant_id + '/volumes/' + res_vol['id'])
                 self.assertEqual(query_resp.status_int, 200)
                 json_body = jsonutils.loads(query_resp.body)
                 query_vol = json_body.get('volume')
@@ -603,7 +603,7 @@ class TestVolumeController(CinderVolumeFunctionalTest):
         for test_vol in volumes:
             if test_vol.get('volume'):
                 response = self.app.post_json(
-                    '/v2/' + tenant_id + '/volumes',
+                    '/v3/' + tenant_id + '/volumes',
                     dict(volume=test_vol['volume']),
                     expect_errors=True)
             self.assertEqual(response.status_int,
@@ -612,16 +612,16 @@ class TestVolumeController(CinderVolumeFunctionalTest):
                 json_body = jsonutils.loads(response.body)
                 _id = json_body.get('volume')['id']
                 query_resp = self.app.get(
-                    '/v2/' + tenant_id + '/volumes/' + _id)
+                    '/v3/' + tenant_id + '/volumes/' + _id)
                 self.assertEqual(query_resp.status_int, 200)
 
                 delete_resp = self.app.delete(
-                    '/v2/' + tenant_id + '/volumes/' + _id)
+                    '/v3/' + tenant_id + '/volumes/' + _id)
                 self.assertEqual(delete_resp.status_int, 202)
 
     def _test_detail_check(self, tenant_id, vol_size):
         resp = self.app.get(
-            '/v2/' + tenant_id + '/volumes' + '/detail',
+            '/v3/' + tenant_id + '/volumes' + '/detail',
             expect_errors=True)
         self.assertEqual(resp.status_int, 200)
         json_body = jsonutils.loads(resp.body)

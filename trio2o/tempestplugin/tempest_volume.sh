@@ -24,14 +24,14 @@ cd $TEMPEST_DIR
 echo "Running Trio2o functional test suite..."
 
 # all test cases with following prefix
-TESTCASES="(tempest.api.volume.test_volumes_list"
-TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_get"
-TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test.test_volume_backup_create_get_detailed_list_restore_delete"
+#TESTCASES="(tempest.api.volume.test_volumes_list"
+#TESTCASES="$TESTCASES|tempest.api.volume.test_volumes_get"
+#TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test.test_volume_backup_create_get_detailed_list_restore_delete"
 # add new test cases like following line for volume_type test
 # TESTCASES="$TESTCASES|tempest.api.volume.admin.test_volumes_type"
-TESTCASES="$TESTCASES)"
+#TESTCASES="$TESTCASES)"
 
-ostestr --regex $TESTCASES
+#ostestr --regex $TESTCASES
 
 # --------------------- IMPORTANT begin -------------------- #
 # all following test cases are from Cinder tempest test cases,
@@ -321,7 +321,7 @@ ostestr --regex $TESTCASES
 # tempest.api.volume.test_volumes_snapshots_negative.VolumesV1SnapshotNegativeTestJSON.test_create_snapshot_without_passing_volume_id[id-bb9da53e-d335-4309-9c15-7e76fd5e4d6d,negative]
 # tempest.api.volume.test_volumes_snapshots_negative.VolumesV2SnapshotNegativeTestJSON.test_create_snapshot_with_nonexistent_volume_id[id-e3e466af-70ab-4f4b-a967-ab04e3532ea7,negative]
 # tempest.api.volume.test_volumes_snapshots_negative.VolumesV2SnapshotNegativeTestJSON.test_create_snapshot_without_passing_volume_id[id-bb9da53e-d335-4309-9c15-7e76fd5e4d6d,negative]
-# tempest.api.volume.v2.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_details_pagination[id-e9138a2c-f67b-4796-8efa-635c196d01de]
-# tempest.api.volume.v2.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_details_with_multiple_params[id-2a7064eb-b9c3-429b-b888-33928fc5edd3]
-# tempest.api.volume.v2.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_pagination[id-af55e775-8e4b-4feb-8719-215c43b0238c]
-# tempest.api.volume.v2.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_with_detail_param_marker[id-46eff077-100b-427f-914e-3db2abcdb7e2]
+# tempest.api.volume.v3.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_details_pagination[id-e9138a2c-f67b-4796-8efa-635c196d01de]
+# tempest.api.volume.v3.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_details_with_multiple_params[id-2a7064eb-b9c3-429b-b888-33928fc5edd3]
+# tempest.api.volume.v3.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_pagination[id-af55e775-8e4b-4feb-8719-215c43b0238c]
+# tempest.api.volume.v3.test_volumes_list.VolumesV2ListTestJSON.test_volume_list_with_detail_param_marker[id-46eff077-100b-427f-914e-3db2abcdb7e2]

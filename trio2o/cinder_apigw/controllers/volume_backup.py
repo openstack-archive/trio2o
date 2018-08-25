@@ -54,8 +54,8 @@ class VolumeBackupController(rest.RestController):
 
         pod_name = volume_mappings[0][0]['pod_name']
 
-        t_release = cons.R_MITAKA
-        b_release = cons.R_MITAKA
+        t_release = cons.T_RELEASE
+        b_release = cons.B_RELEASE
 
         s_ctx = hclient.get_pod_service_ctx(
             context,
