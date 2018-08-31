@@ -20,6 +20,8 @@ from trio2o.common import context
 from trio2o.db import core
 from trio2o.nova_apigw.controllers import flavor
 
+class FakeResponse(object):
+    pass
 
 class FlavorTest(unittest.TestCase):
     def setUp(self):
@@ -28,7 +30,8 @@ class FlavorTest(unittest.TestCase):
         self.context = context.get_admin_context()
         self.project_id = 'test_project'
         self.controller = flavor.FlavorController(self.project_id)
-
+    
+    @patch.object(pecan, 'response', new=FakeResponse)
     @patch.object(context, 'extract_context_from_environ')
     def test_post(self, mock_context):
         mock_context.return_value = self.context
@@ -42,6 +45,7 @@ class FlavorTest(unittest.TestCase):
         self.assertEqual(1024, flavor_dict['memory_mb'])
         self.assertEqual(1, flavor_dict['vcpus'])
         self.assertEqual(10, flavor_dict['root_gb'])
+        self.controller.delete('1')
 
     def tearDown(self):
         core.ModelBase.metadata.drop_all(core.get_engine())
