@@ -214,4 +214,4 @@ class FlavorController(rest.RestController):
         except Exception:
             return utils.format_nova_error(500, _('Failed to delete flavor'))
         pecan.response.status = 202
-        return
+        return pecan.response
