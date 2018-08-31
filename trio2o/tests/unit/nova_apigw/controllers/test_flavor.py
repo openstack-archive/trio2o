@@ -45,3 +45,6 @@ class FlavorTest(unittest.TestCase):
 
     def tearDown(self):
         core.ModelBase.metadata.drop_all(core.get_engine())
+        for res in RES_LIST:
+            del res[:]
+
