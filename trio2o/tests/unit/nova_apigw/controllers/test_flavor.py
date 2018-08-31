@@ -42,6 +42,11 @@ class FlavorTest(unittest.TestCase):
         self.assertEqual(1024, flavor_dict['memory_mb'])
         self.assertEqual(1, flavor_dict['vcpus'])
         self.assertEqual(10, flavor_dict['root_gb'])
+        self.controller.delete('1')
+        res=self.controller.get_one('1')
+        self.assertEqual(404, res['Error']['code'])
+        
 
     def tearDown(self):
         core.ModelBase.metadata.drop_all(core.get_engine())
+
