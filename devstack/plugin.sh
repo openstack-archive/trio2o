@@ -17,15 +17,14 @@ function create_trio2o_accounts {
     if [[ "$ENABLED_SERVICES" =~ "t-oapi" ]]; then
         create_service_user "trio2o"
 
-        if [[ "$KEYSTONE_CATALOG_BACKEND" = 'sql' ]]; then
-            local trio2o_api=$(get_or_create_service "trio2o" \
-                "Cascading" "OpenStack Cascading Service")
-            get_or_create_endpoint $trio2o_api \
-                "$REGION_NAME" \
-                "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0" \
-                "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0" \
-                "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0"
-        fi
+        local trio2o_api=$(get_or_create_service "trio2o" \
+            "Cascading" "OpenStack Cascading Service")
+        get_or_create_endpoint $trio2o_api \
+            "$REGION_NAME" \
+            "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0" \
+            "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0" \
+            "$SERVICE_PROTOCOL://$TRIO2O_API_HOST:$TRIO2O_API_PORT/v1.0"
+
     fi
 }
 
@@ -331,6 +330,7 @@ elif [[ "$1" == "stack" && "$2" == "post-config" ]]; then
 
     export NEUTRON_CREATE_INITIAL_NETWORKS=False
     export DEFAULT_INSTANCE_TYPE=m1.tiny
+    export KEYSTONE_CATALOG_BACKEND=sql
 
     sudo install -d -o $STACK_USER -m 755 $TRIO2O_CONF_DIR
 
