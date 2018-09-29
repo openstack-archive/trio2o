@@ -66,17 +66,22 @@ installing DevStack in virtual machine.
 
 - 8 Get token for the later commands. Run::
 
-      openstack --os-region-name=RegionOne token issue
+      token=$(openstack --os-region-name=RegionOne token issue | awk 'NR==5 {print $4}')
 
-- 9 Create pod instances for the Trio2o to manage the mapping between
+- 9 GET pod instances for the Trio2o to manage the mapping between
   availability zone and OpenStack instances, the "$token" is obtained in the
   step 7::
 
-      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
-          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "RegionOne"}}'
+      curl -X GET http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
+          -H "X-Auth-Token: $token"
+
+  if return empty results, use commands following::
 
       curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
-          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "Pod1", "az_name": "az1"}}'
+          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name": "RegionOne"}}'
+
+      curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
+          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name": "Pod1", "az_name": "az1"}}'
 
   Pay attention to "pod_name" parameter we specify when creating pod. Pod name
   should exactly match the region name registered in Keystone. In the above
@@ -218,14 +223,14 @@ Add another pod to Trio2o with DevStack
 
 - 12 Get token for the later commands. Run::
 
-      openstack --os-region-name=RegionOne token issue
+      token=$(openstack --os-region-name=RegionOne token issue | awk 'NR==5 {print $4}')
 
 - 13 Create Pod2 instances for the Trio2o to manage the mapping between
   availability zone and OpenStack instances, the "$token" is obtained in the
   step 11::
 
       curl -X POST http://127.0.0.1:19996/v1.0/pods -H "Content-Type: application/json" \
-          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name":  "Pod2", "az_name": "az2"}}'
+          -H "X-Auth-Token: $token" -d '{"pod": {"pod_name": "Pod2", "az_name": "az2"}}'
 
   Pay attention to "pod_name" parameter we specify when creating pod. Pod name
   should exactly match the region name registered in Keystone. In the above
