@@ -49,4 +49,5 @@ class ServerExternalEventController(rest.RestController):
 
         pod = mappings[0][0]
         client = self._get_client(pod['pod_name'])
-        return client.create_server_external_events(context, events)
+        return {'events': client.create_server_external_events(
+            context, events)}
