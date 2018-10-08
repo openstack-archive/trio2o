@@ -33,7 +33,7 @@ class APITest(unittest.TestCase):
         self.context = context.Context()
 
     def test_get_bottom_mappings_by_top_id(self):
-        for i in xrange(3):
+        for i in range(3):
             pod = {'pod_id': 'test_pod_uuid_%d' % i,
                    'pod_name': 'test_pod_%d' % i,
                    'az_name': 'test_az_uuid_%d' % i}
@@ -63,7 +63,7 @@ class APITest(unittest.TestCase):
         self.assertEqual('bottom_uuid_1', mappings[0][1])
 
     def test_get_bottom_mappings_by_tenant_pod(self):
-        for i in xrange(3):
+        for i in range(3):
             pod = {'pod_id': 'test_pod_uuid_%d' % i,
                    'pod_name': 'test_pod_%d' % i,
                    'az_name': 'test_az_uuid_%d' % i}
@@ -163,7 +163,7 @@ class APITest(unittest.TestCase):
         next_pod = api.get_next_bottom_pod(self.context)
         self.assertIsNone(next_pod)
         pods = []
-        for i in xrange(5):
+        for i in range(5):
             pod = {'pod_id': 'test_pod_uuid_%d' % i,
                    'pod_name': 'test_pod_%d' % i,
                    'pod_az_name': 'test_pod_az_name_%d' % i,

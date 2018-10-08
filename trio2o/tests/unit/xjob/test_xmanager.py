@@ -167,7 +167,7 @@ class XManagerTest(unittest.TestCase):
         job_status = [job['status'] for job in jobs]
         self.assertItemsEqual(expected_status, job_status)
 
-        for i in xrange(3):
+        for i in range(3):
             self.assertEqual(fake_id, jobs[i]['resource_id'])
             self.assertEqual('fake_resource', jobs[i]['type'])
 

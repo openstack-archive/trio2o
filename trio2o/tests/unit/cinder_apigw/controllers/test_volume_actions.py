@@ -56,7 +56,7 @@ class VolumeActionTest(unittest.TestCase):
             api.create_pod(self.context, b_pod)
             b_pods.append(b_pod)
         else:
-            for i in xrange(1, bottom_pod_num + 1):
+            for i in range(1, bottom_pod_num + 1):
                 b_pod = {'pod_id': 'b_pod_%d_uuid' % i,
                          'pod_name': 'b_region_%d' % i,
                          'az_name': 'b_az_%d' % i}
