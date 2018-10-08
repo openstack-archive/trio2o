@@ -80,7 +80,7 @@ def _safe_operation(operation_name):
                     operation_name]:
                 raise exceptions.ResourceNotSupported(resource, operation_name)
             retries = 1
-            for i in xrange(retries + 1):
+            for i in range(retries + 1):
                 try:
                     service = instance.resource_service_map[resource]
                     instance._ensure_endpoint_set(context, service)

@@ -91,7 +91,7 @@ def get_or_create_element(t_ctx, q_ctx,
                           list_ele_method, create_ele_method):
     # use configuration option later
     max_tries = 5
-    for _ in xrange(max_tries):
+    for _ in range(max_tries):
         route, status = get_or_create_route(
             t_ctx, q_ctx, project_id, pod, ele, _type, list_ele_method)
         if not route:
