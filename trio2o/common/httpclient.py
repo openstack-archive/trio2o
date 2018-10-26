@@ -14,7 +14,10 @@
 #    under the License.
 
 import urllib
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    import urllib.parse as urlparse
 
 from requests import Request
 from requests import Session
