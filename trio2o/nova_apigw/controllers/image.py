@@ -102,6 +102,12 @@ class ImageController(rest.RestController):
             'metadata': image.get('properties', {}),
             'created': image.get('created_at'),
             'updated': image.get('updated_at'),
+            'container_format': image.get('container_format'),
+            'disk_format': image.get('disk_format'),
+            'protected': image.get('protected'),
+            'size': int(image.get('size') or 0),
+            'tags': image.get('tags', []),
+            'visibility': image.get('visibility'),
             'status': self._get_status(image),
             'progress': self._get_progress(image),
             'links': self._get_links(context, image)
