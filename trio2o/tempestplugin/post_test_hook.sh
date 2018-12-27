@@ -60,7 +60,7 @@ fi
 sudo chown -R $USER:stack $DEST/tempest
 # sudo chown -R $USER:stack $BASE/data/tempest
 
-# change the tempest configruation to test Trio2o
+# change the tempest configuration to test Trio2o
 env | grep OS_
 
 # import functions needed for the below workaround
