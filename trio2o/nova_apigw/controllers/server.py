@@ -73,6 +73,9 @@ class ServerController(rest.RestController):
     def _construct_brief_server_entry(server):
         return {'id': server['id'],
                 'name': server.get('name'),
+                'status': server.get('status'),
+                'tags': server.get('tags'),
+                'metadata': server.get('metadata'),
                 'links': server.get('links')}
 
     @expose(generic=True, template='json')
@@ -80,8 +83,6 @@ class ServerController(rest.RestController):
         context = t_context.extract_context_from_environ()
 
         if _id == 'detail':
-            # return {'servers': [self._construct_brief_server_entry(
-            #     server) for server in self._get_all(context, kwargs)]}
             return {'servers': self._get_all(context, kwargs)}
 
         mappings = db_api.get_bottom_mappings_by_top_id(
@@ -101,8 +102,6 @@ class ServerController(rest.RestController):
     @expose(generic=True, template='json')
     def get_all(self, **kwargs):
         context = t_context.extract_context_from_environ()
-        # return {'servers': [self._construct_brief_server_entry(
-        #     server) for server in self._get_all(context, kwargs)]}
         return {'servers': self._get_all(context, kwargs)}
 
     @expose(generic=True, template='json')
