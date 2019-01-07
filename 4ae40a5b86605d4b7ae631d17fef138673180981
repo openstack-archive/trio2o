@@ -1,0 +1,8 @@
+Workflow+1: chzhang8 <zhangchi@szzt.com.cn>
+Code-Review+2: chzhang8 <zhangchi@szzt.com.cn>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Mon, 07 Jan 2019 02:01:09 +0000
+Reviewed-on: https://review.openstack.org/627773
+Project: openstack/trio2o
+Branch: refs/heads/master
