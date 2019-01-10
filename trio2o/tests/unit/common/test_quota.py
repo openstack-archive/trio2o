@@ -1660,10 +1660,10 @@ class QuotaSetsOperationTest(DbQuotaDriverTestCase, base.TestCase):
         self._create_project_hierarchy()
         self._create_default_class()
 
-        self.subproject_defualt_quota = {}
-        self.subproject_defualt_quota = copy.copy(self.default_quota)
-        for k in self.subproject_defualt_quota:
-            self.subproject_defualt_quota[k] = 0
+        self.subproject_default_quota = {}
+        self.subproject_default_quota = copy.copy(self.default_quota)
+        for k in self.subproject_default_quota:
+            self.subproject_default_quota[k] = 0
 
     def _create_project_hierarchy(self):
         """Sets an environment used for nested quotas tests.
@@ -1758,7 +1758,7 @@ class QuotaSetsOperationTest(DbQuotaDriverTestCase, base.TestCase):
         self.ctx.project_id = self.B.parent_id
         result = qso.show_default_quota(self.ctx)
         expected = _make_subproject_body(tenant_id=self.B.id, root=True,
-                                         **self.subproject_defualt_quota)
+                                         **self.subproject_default_quota)
         self.assertDictMatch(expected, result)
 
     def test_show(self):
@@ -1778,7 +1778,7 @@ class QuotaSetsOperationTest(DbQuotaDriverTestCase, base.TestCase):
         self.ctx.project_id = self.B.parent_id
         result = qso.show_detail_quota(self.ctx)
         expected = _make_subproject_body(tenant_id=self.B.id, root=True,
-                                         **self.subproject_defualt_quota)
+                                         **self.subproject_default_quota)
         self.assertDictMatch(expected, result)
 
     def test_subproject_show_in_hierarchy_1(self):
@@ -1788,7 +1788,7 @@ class QuotaSetsOperationTest(DbQuotaDriverTestCase, base.TestCase):
         self.ctx.project_id = self.A.id
         result = qso.show_detail_quota(self.ctx)
         expected = _make_subproject_body(tenant_id=self.D.id, root=True,
-                                         **self.subproject_defualt_quota)
+                                         **self.subproject_default_quota)
         self.assertDictMatch(expected, result)
 
     def test_subproject_show_in_hierarchy_2(self):
@@ -1798,7 +1798,7 @@ class QuotaSetsOperationTest(DbQuotaDriverTestCase, base.TestCase):
         self.ctx.project_id = self.B.id
         result = qso.show_detail_quota(self.ctx)
         expected = _make_subproject_body(tenant_id=self.D.id, root=True,
-                                         **self.subproject_defualt_quota)
+                                         **self.subproject_default_quota)
         self.assertDictMatch(expected, result)
 
     def test_subproject_show_target_project_equals_to_context_project(self):
@@ -1808,7 +1808,7 @@ class QuotaSetsOperationTest(DbQuotaDriverTestCase, base.TestCase):
         self.ctx.project_id = self.B.id
         result = qso.show_detail_quota(self.ctx)
         expected = _make_subproject_body(tenant_id=self.B.id, root=True,
-                                         **self.subproject_defualt_quota)
+                                         **self.subproject_default_quota)
         self.assertDictMatch(expected, result)
 
     def test_show_not_authorized(self):
