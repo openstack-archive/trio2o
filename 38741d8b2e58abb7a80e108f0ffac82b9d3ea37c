@@ -1,0 +1,8 @@
+Code-Review+2: Zhang Chi <zhangchi@szzt.com.cn>
+Workflow+1: Zhang Chi <zhangchi@szzt.com.cn>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 27 Mar 2019 03:50:00 +0000
+Reviewed-on: https://review.openstack.org/647984
+Project: openstack/trio2o
+Branch: refs/heads/master
