@@ -31,6 +31,10 @@ SUPPORTED_FILTERS = {
     'type': 'property-image_type',
     'minRam': 'min_ram',
     'minDisk': 'min_disk',
+    'created': 'created_at',
+    'updated': 'updated_at',
+    'visibility': 'visibility',
+    'tags':  'tags',
 }
 
 
